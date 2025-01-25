@@ -67,3 +67,162 @@ type RegisterChorePayload struct {
 	TimeEstimate    int    `json:"timeEstimate" validate:"required"`
 	CompletitonTime int    `json:"completionTime" validate:"required"`
 }
+
+//Chore Instance type
+type ChoreInstance struct {
+	UserID    int       `json:"userID"`
+	ChoreID   int       `json:"choreID"`
+	Completed bool      `json:"completed"`
+	DueDate   time.Time `json:"dueDate"`
+}
+
+type ChoreInstanceStore interface {
+	GetChoreInstanceByUserID(userId int) ([]*ChoreInstance, error)
+	GetChoreInstanceByChoreID(choreId int) ([]*ChoreInstance, error)
+	CreateChoreInstance(ChoreInstance) error
+}
+
+type RegisterChoreInstancePayload struct {
+	UserID    int       `json:"userID" validate:"required"`
+	ChoreID   int       `json:"choreID" validate:"required"`
+	Completed bool      `json:"completed" validate:"required"`
+	DueDate   time.Time `json:"dueDate" validate:"required"`
+}
+
+// -- Bill Types 
+
+type Bill struct {
+	ID          int       `json:"ID"`
+	PurchaseDate time.Time `json:"purchaseDate"`
+	PayerID    int       `json:"payerID"`
+}
+
+type BillStore interface {
+	GetBillByID(id int) (*Bill, error)
+	CreateBill(Bill) error
+}
+
+type RegisterBillPayload struct {
+	PurchaseDate time.Time `json:"purchaseDate" validate:"required"`
+	PayerID    int       `json:"payerID" validate:"required"`
+}
+
+// -- Debt Types
+
+type Debt struct {
+	BillID int `json:"billID"`
+	UserID int `json:"userID"`
+	Amount float64 `json:"amount"`
+}
+
+type DebtStore interface {	
+	GetDebtByBillID(id int) ([]*Debt, error)
+	GetDebtByUserID(id int) ([]*Debt, error)
+	CreateDebt(Debt) error
+}
+
+type RegisterDebtPayload struct {
+	BillID int `json:"billID" validate:"required"`
+	UserID int `json:"userID" validate:"required"`
+	Amount float64 `json:"amount" validate:"required"`
+}
+
+// -- HouseholdChore Types
+
+type HouseholdChore struct {
+	HouseholdID int `json:"householdID"`
+	ChoreID int `json:"choreID"`
+}
+
+type HouseholdChoreStore interface {
+	GetHouseholdChoreByHouseholdID(id int) ([]*HouseholdChore, error)
+	GetHouseholdChoreByChoreID(id int) ([]*HouseholdChore, error)
+	CreateHouseholdChore(HouseholdChore) error
+}
+
+type RegisterHouseholdChorePayload struct {
+	HouseholdID int `json:"householdID" validate:"required"`
+	ChoreID int `json:"choreID" validate:"required"`
+}
+
+// -- Collectible Types
+
+type Collectible struct {
+	ID int `json:"ID"`
+	Name string `json:"name"`
+	IsLegendary bool `json:"isLegendary"`
+	UserID int `json:"userID"`
+	ImageURL string `json:"imageURL"`
+	Evolution int `json:"evolution"`
+}
+
+type CollectibleStore interface {
+	GetCollectibleByID(id int) (*Collectible, error)
+	CreateCollectible(Collectible) error
+}
+
+type RegisterCollectiblePayload struct {
+	Name string `json:"name" validate:"required"`
+	IsLegendary bool `json:"isLegendary" validate:"required"`
+	UserID int `json:"userID" validate:"required"`
+	ImageURL string `json:"imageURL" validate:"required"`
+	Evolution int `json:"evolution" validate:"required"`
+}
+
+// -- TradeRequest Types
+
+type TradeRequest struct {
+	ID int `json:"ID"`
+}
+
+type TradeRequestStore interface {
+	GetTradeRequestByID(id int) (*TradeRequest, error)
+	CreateTradeRequest(TradeRequest) error
+}
+
+type RegisterTradeRequestPayload struct {
+}
+
+// -- CollectibleTradeItem Types
+
+type CollectibleTradeItem struct {
+	TradeRequestID int `json:"tradeRequestID"`
+	CollectibleID int `json:"collectibleID"`
+	SenderID int `json:"senderID"`
+}
+
+type CollectibleTradeItemStore interface {
+	GetCollectibleTradeItemByTradeRequestID(id int) ([]*CollectibleTradeItem, error)
+	GetCollectibleTradeItemByCollectibleID(id int) ([]*CollectibleTradeItem, error)
+	CreateCollectibleTradeItem(CollectibleTradeItem) error
+}
+
+type RegisterCollectibleTradeItemPayload struct {
+	TradeRequestID int `json:"tradeRequestID" validate:"required"`
+	CollectibleID int `json:"collectibleID" validate:"required"`
+	SenderID int `json:"senderID" validate:"required"`
+}
+
+// -- ChoreTradeItem Types
+
+type ChoreTradeItem struct {
+	TradeRequestID int `json:"tradeRequestID"`
+	ChoreID int `json:"choreID"`
+	SenderID int `json:"senderID"`
+}
+
+type ChoreTradeItemStore interface {
+	GetChoreTradeItemByTradeRequestID(id int) ([]*ChoreTradeItem, error)
+	GetChoreTradeItemByChoreID(id int) ([]*ChoreTradeItem, error)
+	CreateChoreTradeItem(ChoreTradeItem) error
+}
+
+type RegisterChoreTradeItemPayload struct {
+	TradeRequestID int `json:"tradeRequestID" validate:"required"`
+	ChoreID int `json:"choreID" validate:"required"`
+	SenderID int `json:"senderID" validate:"required"`
+}
+
+
+
+

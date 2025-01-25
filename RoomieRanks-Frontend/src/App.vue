@@ -1,85 +1,172 @@
-<script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+<script setup>
+import { RouterLink, RouterView } from 'vue-router';
+import { session } from './session.ts';
+import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+// onMounted(() => {
+//   // Initialize session storage if not set
+//   if (!sessionStorage.getItem("loggedInUsername")) {
+//     sessionStorage.setItem("loggedInUsername", "guest");
+//     session.loggedInUsername = "guest";
+//   }
+//   if (!sessionStorage.getItem("permissionLevel")) {
+//     sessionStorage.setItem("permissionLevel", 0);
+//     session.permissionLevel = 0;
+//   }
+// });
+
+// function handleLogout() {
+//   session.logout();
+//   router.push("/");
+// }
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
+  <div id="app">
+    <header>
+      <nav class="navbar">
+        <div class="nav-container">
+          <RouterLink to="/" class="nav-logo">
+            <img src="@/assets/roomie_logo.webp" alt="Logo" class="logo-image" />
+          </RouterLink>
+          <div class="nav-links">
+            <RouterLink to="/" class="nav-item">Home</RouterLink> 
+            <RouterLink to="/trade" class="nav-item">Trade</RouterLink>
+            <RouterLink to="/money" class="nav-item">Money Management</RouterLink>
+            <RouterLink to="/profile" class="nav-item">Profile</RouterLink>
+            <RouterLink to="/login" class="nav-item">Login/Register</RouterLink>
+            <button class="nav-item" v-if="session.permissionLevel != 0" @click="handleLogout">Logout</button>
+          </div>
+        </div>
       </nav>
-    </div>
-  </header>
+    </header>
 
-  <RouterView />
+    <main>
+      <RouterView />
+    </main>
+  </div>
 </template>
 
 <style scoped>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+}
+
 header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
   width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+  background-color: #2C3D47; 
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
+.navbar {
+  max-width: 1200px; 
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+  margin-left: 10%; 
 }
 
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
+.nav-logo {
+  display: flex;
+  align-items: center;
+  margin-left: -85px;
 }
 
-nav a:first-of-type {
-  border: 0;
+.nav-links {
+  display: flex;
+  gap: 1rem;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
+.nav-item {
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  background-color: transparent; 
+}
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
+.nav-item:hover {
+  background-color: rgba(147, 81, 247, 0.2);
+  transform: scale(1.05);
+}
 
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+.nav-item:active {
+  background-color: rgba(147, 81, 247, 0.3);
+  transform: scale(0.98);
+}
 
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
+.nav-item:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(147, 81, 247, 0.5);
+}
 
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+.router-link-exact-active.nav-item {
+  background-color: rgba(147, 81, 247, 0.3);
+}
+
+.router-link-active.nav-item {
+  background-color: transparent; 
+}
+
+main {
+  flex: 1;
+  padding: 0;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.logo-image {
+  height: 75px;
+  width: auto;
+  display: block;
+}
+
+button.nav-item {
+  all: unset; 
+  color: #fff;
+  cursor: pointer;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  background-color: transparent; 
+}
+
+button.nav-item:hover {
+  background-color: rgba(147, 81, 247, 0.2);
+  transform: scale(1.05);
+}
+
+button.nav-item:active {
+  background-color: rgba(147, 81, 247, 0.3);
+  transform: scale(0.98);
+}
+
+button.nav-item:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(147, 81, 247, 0.5);
 }
 </style>
