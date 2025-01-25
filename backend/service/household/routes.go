@@ -40,5 +40,16 @@ func (h *Handler) handleCreateHousehold(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	//THIS IS NOT DONE YET
+	//Create the household
+	err := h.store.CreateHousehold(types.Household{Name: payload.Name})
+
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	message := fmt.Sprintf("Household with name %s created", payload.Name)
+
+	// If everything went well we can return a message
+	utils.WriteJSON(w, http.StatusCreated, message)
 }

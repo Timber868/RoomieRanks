@@ -76,5 +76,6 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusCreated, nil)
+	//DIsplay some message to send back to the user
+	utils.WriteJSON(w, http.StatusCreated, "User created successfully")
 }

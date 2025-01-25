@@ -41,7 +41,7 @@ func (s *Store) GetHouseholdByID(id int) (*types.Household, error) {
 	return h, nil
 }
 
-func (s *Store) CreateHousehold(h *types.Household) error {
+func (s *Store) CreateHousehold(h types.Household) error {
 	//Insert the household into the database
 	_, err := s.db.Exec("INSERT INTO households (name) VALUES (?)", h.Name)
 
