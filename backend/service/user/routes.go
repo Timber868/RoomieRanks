@@ -49,8 +49,15 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Check in the database if the user exists
-	_, err := h.store.GetUserByEmail(payload.Email)
-	if err == nil {
+	u, _ := h.store.GetUserByUsername(payload.Username)
+	if u != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("user with username %s already exists", payload.Username))
+		return
+	}
+
+	//Check if the email exists
+	u, _ = h.store.GetUserByEmail(payload.Email)
+	if u != nil {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("user with email %s already exists", payload.Email))
 		return
 	}
@@ -64,10 +71,13 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	//If not then you can register the user
 	err = h.store.CreateUser(types.User{
-		FirstName: payload.FirstName,
-		LastName:  payload.LastName,
-		Password:  hashedPassword,
-		Email:     payload.Email,
+		Username:    payload.Username,
+		Name:        payload.Name,
+		Password:    hashedPassword,
+		Email:       payload.Email,
+		HouseholdID: 0, // Users dont start off with households
+		Title:       "Newbie",
+		Level:       1, //You start off at level 1
 	})
 
 	//Do error handling to validate data

@@ -23,10 +23,8 @@ func TestUserServiceHandlers(t *testing.T) {
 		*/
 
 		payload := types.RegisterUserPayload{
-			FirstName: "user",
-			LastName:  "lastName",
-			Password:  "asd",
-			Email:     "sad",
+			Password: "asd",
+			Email:    "sad",
 		}
 
 		//Youve got to marshal your struct into a json
@@ -58,10 +56,10 @@ func TestUserServiceHandlers(t *testing.T) {
 		*/
 
 		payload := types.RegisterUserPayload{
-			FirstName: "user",
-			LastName:  "lastName",
-			Password:  "invalid",
-			Email:     "sad@gmail.com",
+			Username: "user",
+			Name:     "hi",
+			Password: "invalid",
+			Email:    "sad@gmail.com",
 		}
 
 		//Youve got to marshal your struct into a json
@@ -91,8 +89,8 @@ func TestUserServiceHandlers(t *testing.T) {
 type mockUserStore struct{}
 
 // Methods needed for a user store need to be mocked
-func (s *mockUserStore) GetUserByEmail(email string) (*types.User, error) {
-	return nil, fmt.Errorf("email not found") //This needs to be mocked to ignore the case where user already exists
+func (s *mockUserStore) GetUserByUsername(email string) (*types.User, error) {
+	return nil, fmt.Errorf("username not found") //This needs to be mocked to ignore the case where user already exists
 }
 
 func (s *mockUserStore) GetUserByID(id int) (*types.User, error) {
@@ -101,4 +99,20 @@ func (s *mockUserStore) GetUserByID(id int) (*types.User, error) {
 
 func (s *mockUserStore) CreateUser(user types.User) error {
 	return nil
+}
+
+func (s *mockUserStore) ModifyUser(user types.User) error {
+	return nil
+}
+
+func (s *mockUserStore) ChangeTitle(username string, title string) error {
+	return nil
+}
+
+func (s *mockUserStore) LevelUp(username string) error {
+	return nil
+}
+
+func (s *mockUserStore) GetUserByEmail(email string) (*types.User, error) {
+	return nil, nil
 }

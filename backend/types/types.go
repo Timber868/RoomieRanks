@@ -1,32 +1,33 @@
 package types
 
-import "time"
-
 // -- User types
 
 //This is the type i am going to be using to read json data sent and parse payload
 type RegisterUserPayload struct {
-	FirstName string `json:"firstName" validate:"required"`
-	LastName  string `json:"lastName" validate:"required"`
-	Email     string `json:"email" validate:"required,email"`
-	Password  string `json:"password" validate:"required,min=3,max=130"`
+	Username string `json:"username" validate:"required,min=3,max=130"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=3,max=130"`
+	Name     string `json:"name" validate:"required"`
 }
 
 type User struct {
-	ID          int       `json:"ID"`
-	FirstName   string    `json:"firstName"`
-	LastName    string    `json:"lastName"`
-	Email       string    `json:"email"`
-	Password    string    `json:"-"`
-	CreatedAt   time.Time `json:"createdAT"`
-	HouseholdID int       `json:"householdID"`
+	Username    string `json:"username"`
+	Name        string `json:"name"`
+	Email       string `json:"email"`
+	Password    string `json:"-"`
+	HouseholdID int    `json:"household_id"`
+	Title       string `json:"title"`
+	Level       int    `json:"level"`
 }
 
 //Interfaces are super easy to test so thats why
 type UserStore interface {
+	GetUserByUsername(username string) (*User, error)
 	GetUserByEmail(email string) (*User, error)
-	GetUserByID(id int) (*User, error)
 	CreateUser(User) error
+	ModifyUser(User) error
+	ChangeTitle(username string, title string) error
+	LevelUp(username string) error
 }
 
 // -- Household types

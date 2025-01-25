@@ -1,11 +1,14 @@
 CREATE TABLE IF NOT EXISTS users (
-    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `firstName` VARCHAR(255) NOT NULL,
-    `lastName` VARCHAR(255) NOT NULL,
+    `username` VARCHAR(255) NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
     `email` VARCHAR(255) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
-    `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `household_id` INT UNSIGNED,
+    `title` VARCHAR(255) NOT NULL,
+    `level` INT UNSIGNED NOT NULL,
 
-    PRIMARY KEY (`id`),
+
+    PRIMARY KEY (`username`),
+    UNIQUE KEY `username` (`username`),
     UNIQUE KEY `email` (`email`)
 );
