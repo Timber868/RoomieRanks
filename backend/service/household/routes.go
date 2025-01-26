@@ -81,7 +81,7 @@ func (h *Handler) handleGetHousehold(w http.ResponseWriter, r *http.Request) {
 	//Get the household from the store
 	household, err := h.store.GetHouseholdByID(householdID)
 	if err != nil {
-		utils.WriteError(w, http.StatusInternalServerError, err)
+		utils.WriteError(w, http.StatusNotFound, err)
 		return
 	}
 

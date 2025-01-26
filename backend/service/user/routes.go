@@ -23,6 +23,7 @@ func NewHandler(store types.UserStore) *Handler {
 func (h *Handler) RegisterRoute(router *mux.Router) {
 	router.HandleFunc("/login", h.handleLogin).Methods("POST")
 	router.HandleFunc("/register", h.handleRegister).Methods("POST")
+	router.HandleFunc("/user/{username}", h.handleGetUser).Methods("GET")
 }
 
 func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -116,4 +117,25 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	//DIsplay some message to send back to the user
 	utils.WriteJSON(w, http.StatusCreated, "User created successfully")
+}
+
+func (h *Handler) handleGetUser(w http.ResponseWriter, r *http.Request) {
+	//Get the username from the url
+	vars := mux.Vars(r)
+	username, ok := vars["username"]
+
+	// Validate that the username is there
+	if !ok {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("missing username"))
+		return
+	}
+
+	//Get the user from the store
+	user, err := h.store.GetUserByUsername(username)
+	if err != nil {
+		utils.WriteError(w, http.StatusNotFound, err)
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, user)
 }
