@@ -25,7 +25,7 @@ func (h *Handler) RegisterRoute(router *mux.Router) {
 	router.HandleFunc("/register", h.handleRegister).Methods("POST")
 	router.HandleFunc("/user/{username}", h.handleGetUser).Methods("GET")
 	router.HandleFunc("/user/{username}/level", h.handleLevelUp).Methods("POST")
-	// router.HandleFunc("/user/{username}/title", h.handleChangeTitle).Methods("POST")
+	router.HandleFunc("/user/{username}/title", h.handleChangeTitle).Methods("POST")
 }
 
 func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -163,4 +163,43 @@ func (h *Handler) handleLevelUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJSON(w, http.StatusOK, "User leveled up")
+}
+
+func (h *Handler) handleChangeTitle(w http.ResponseWriter, r *http.Request) {
+	//Get the username from the url
+	vars := mux.Vars(r)
+	username, ok := vars["username"]
+
+	// Validate that the username is there
+	if !ok {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("missing username"))
+		return
+	}
+
+	//Type we will use to decode our payload
+	var payload types.ChangeTitlePayload
+
+	//Make sure it is a valid json
+	if err := utils.ParseJson(r, &payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	//validate the payload
+	if err := utils.Validate.Struct(payload); err != nil {
+		errors := err.(validator.ValidationErrors) //Necessary to get the erro message
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", errors))
+		return
+	}
+
+	//Change the title
+	err := h.store.ChangeTitle(username, payload.Title)
+	if err == fmt.Errorf("user not found") {
+		utils.WriteError(w, http.StatusNotFound, err)
+		return
+	} else if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+	}
+
+	utils.WriteJSON(w, http.StatusOK, "Title changed")
 }

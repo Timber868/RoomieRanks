@@ -17,6 +17,10 @@ type LoginUserPayload struct {
 	Password string `json:"password" validate:"required"`
 }
 
+type ChangeTitlePayload struct {
+	Title string `json:"title" validate:"required"`
+}
+
 type User struct {
 	Username    string `json:"username"`
 	Name        string `json:"name"`

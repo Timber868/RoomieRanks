@@ -107,7 +107,20 @@ func (s *Store) ModifyUser(user types.User) error {
 }
 
 func (s *Store) ChangeTitle(username string, title string) error {
-	//To be implemented
+	u, err := s.GetUserByUsername(username)
+	if err != nil {
+		return fmt.Errorf("user not found")
+	}
+
+	//Update the title
+	u.Title = title
+
+	//Update the user in the database
+	_, err = s.db.Exec("UPDATE users SET title = ? WHERE username = ?", title, username)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
