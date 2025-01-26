@@ -72,20 +72,25 @@ type RegisterChorePayload struct {
 
 //Chore Instance type
 type ChoreInstance struct {
-	UserID    int       `json:"userID"`
+	ID        int       `json:"id"`
+	Username  string    `json:"username"`
 	ChoreID   int       `json:"choreID"`
 	Completed bool      `json:"completed"`
 	DueDate   time.Time `json:"dueDate"`
 }
 
 type ChoreInstanceStore interface {
-	GetChoreInstanceByUserID(userId int) ([]*ChoreInstance, error)
+	GetChoreInstanceByUsername(username string) ([]*ChoreInstance, error)
 	GetChoreInstanceByChoreID(choreId int) ([]*ChoreInstance, error)
 	CreateChoreInstance(ChoreInstance) error
+	GetChoreInstanceByID(choreInstanceId int) (ChoreInstance, error)
+	AssignChoreInstance(choreInstanceId int, username string) error
+	GetChoreXP(choreInstanceId int) (int, error)
+	CompleteChore(choreInstanceId int) error
 }
 
 type RegisterChoreInstancePayload struct {
-	UserID    int       `json:"userID" validate:"required"`
+	Username  string    `json:"username" validate:"required"`
 	ChoreID   int       `json:"choreID" validate:"required"`
 	Completed bool      `json:"completed" validate:"required"`
 	DueDate   time.Time `json:"dueDate" validate:"required"`
@@ -112,21 +117,21 @@ type RegisterBillPayload struct {
 // -- Debt Types
 
 type Debt struct {
-	BillID int     `json:"billID"`
-	UserID int     `json:"userID"`
-	Amount float64 `json:"amount"`
+	BillID   int     `json:"billID"`
+	Username string  `json:"username"`
+	Amount   float64 `json:"amount"`
 }
 
 type DebtStore interface {
 	GetDebtByBillID(id int) ([]*Debt, error)
-	GetDebtByUserID(id int) ([]*Debt, error)
+	GetDebtByUsername(username string) ([]*Debt, error)
 	CreateDebt(Debt) error
 }
 
 type RegisterDebtPayload struct {
-	BillID int     `json:"billID" validate:"required"`
-	UserID int     `json:"userID" validate:"required"`
-	Amount float64 `json:"amount" validate:"required"`
+	BillID   int     `json:"billID" validate:"required"`
+	Username string  `json:"username" validate:"required"`
+	Amount   float64 `json:"amount" validate:"required"`
 }
 
 // -- HouseholdChore Types
@@ -152,7 +157,7 @@ type Collectible struct {
 	ID          int    `json:"ID"`
 	Name        string `json:"name"`
 	IsLegendary bool   `json:"isLegendary"`
-	UserID      int    `json:"userID"`
+	Username    string `json:"username"`
 	ImageURL    string `json:"imageURL"`
 	Evolution   int    `json:"evolution"`
 }
@@ -165,7 +170,7 @@ type CollectibleStore interface {
 type RegisterCollectiblePayload struct {
 	Name        string `json:"name" validate:"required"`
 	IsLegendary bool   `json:"isLegendary" validate:"required"`
-	UserID      int    `json:"userID" validate:"required"`
+	Username    string `json:"username" validate:"required"`
 	ImageURL    string `json:"imageURL" validate:"required"`
 	Evolution   int    `json:"evolution" validate:"required"`
 }
