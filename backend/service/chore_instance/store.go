@@ -8,6 +8,7 @@ import (
 
 	//Import Chore/store.go
 	"github.com/Timber868/roomieranks/service/chore"
+	"github.com/Timber868/roomieranks/service/user"
 )
 
 //This is our file to handle repositories
@@ -29,7 +30,6 @@ func scanRowIntoChoreInstance(rows *sql.Rows) (*types.ChoreInstance, error) {
 
 	//Directly map the data to our user via pointers
 	err := rows.Scan(
-		&choreInstance.ID,
 		&choreInstance.ChoreID,
 		&choreInstance.Username,
 		&choreInstance.DueDate,
@@ -103,7 +103,7 @@ func (s *Store) CreateChoreInstance(choreInstance types.ChoreInstance) error {
 
 func (s *Store) GetChoreInstanceByID(choreInstanceId int) (*types.ChoreInstance, error) {
 	//Just use basic sql to communicate with the database
-	rows, err := s.db.Query("SELECT * FROM chore_instance WHERE id = ?", choreInstanceId)
+	rows, err := s.db.Query("SELECT * FROM chore_instance WHERE chore_id = ?", choreInstanceId)
 
 	if err != nil {
 		return nil, err
@@ -124,7 +124,7 @@ func (s *Store) GetChoreInstanceByID(choreInstanceId int) (*types.ChoreInstance,
 }
 
 func (s *Store) AssignChoreInstance(choreInstanceId int, username string) error {
-	updateQuery := fmt.Sprintf("UPDATE chore_instance SET username = %s WHERE id = %d", username, choreInstanceId)
+	updateQuery := fmt.Sprintf("UPDATE chore_instance SET username = %s WHERE chore_id = %d", username, choreInstanceId)
 
 	_, err := s.db.Exec(updateQuery)
 	if err != nil {
@@ -160,6 +160,22 @@ func (s *Store) CompleteChore(choreInstanceId int) error {
 	if err != nil {
 		return fmt.Errorf("failed to update row: %w", err)
 	}
-	//TODO - Add XP to user
+
+	xp, err := s.GetChoreXP(choreInstanceId)
+	if err != nil {
+		return err
+	}
+
+	chore_instance, err := s.GetChoreInstanceByID(choreInstanceId)
+	if err != nil {
+		return err
+	}
+
+	userStore := user.NewStore(s.db)
+
+	fmt.Println(chore_instance.Username)
+	fmt.Println(xp)
+	userStore.AddXP(chore_instance.Username, xp)
+
 	return nil
 }

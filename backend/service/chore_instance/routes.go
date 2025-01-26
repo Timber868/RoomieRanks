@@ -124,4 +124,6 @@ func (h *Handler) handleCompleteChoreInstance(w http.ResponseWriter, r *http.Req
 		utils.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
+
+	utils.WriteJson(w, http.StatusCreated, "Chore Completed")
 }
