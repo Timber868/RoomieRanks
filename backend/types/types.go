@@ -4,7 +4,7 @@ import "time"
 
 // -- User types
 
-//This is the type i am going to be using to read json data sent and parse payload
+// This is the type i am going to be using to read json data sent and parse payload
 type RegisterUserPayload struct {
 	Username string `json:"username" validate:"required,min=3,max=130"`
 	Email    string `json:"email" validate:"required,email"`
@@ -35,7 +35,7 @@ type User struct {
 	Level       int    `json:"level"`
 }
 
-//Interfaces are super easy to test so thats why
+// Interfaces are super easy to test so thats why
 type UserStore interface {
 	GetUserByUsername(username string) (*User, error)
 	GetUserByEmail(email string) (*User, error)
@@ -64,26 +64,29 @@ type RegisterHouseholdPayload struct {
 type Chore struct {
 	ID              int    `json:"ID"`
 	Name            string `json:"name"`
-	XP              int    `json:"xp"`
 	Difficulty      int    `json:"difficulty"`
 	TimeEstimate    int    `json:"timeEstimate"`
 	CompletitonTime int    `json:"completionTime"`
+	HouseholdID     int    `json:"householdID"`
 }
 
 type ChoreStore interface {
 	GetChoreByID(id int) (*Chore, error)
 	CreateChore(Chore) error
+	GetChoreByHouseholdID(id int) ([]*Chore, error)
+	UpdateChore(Chore) error
+	DeleteChore(id int) error
 }
 
 type RegisterChorePayload struct {
 	Name            string `json:"name" validate:"required"`
-	XP              int    `json:"xp" validate:"required"`
 	Difficulty      int    `json:"difficulty" validate:"required"`
 	TimeEstimate    int    `json:"timeEstimate" validate:"required"`
 	CompletitonTime int    `json:"completionTime" validate:"required"`
+	HouseholdID     int    `json:"householdID" validate:"required"`
 }
 
-//Chore Instance type
+// Chore Instance type
 type ChoreInstance struct {
 	UserID    int       `json:"userID"`
 	ChoreID   int       `json:"choreID"`
@@ -140,23 +143,6 @@ type RegisterDebtPayload struct {
 	BillID int     `json:"billID" validate:"required"`
 	UserID int     `json:"userID" validate:"required"`
 	Amount float64 `json:"amount" validate:"required"`
-}
-
-// -- HouseholdChore Types
-
-type HouseholdChore struct {
-	HouseholdID int `json:"householdID"`
-	ChoreID     int `json:"choreID"`
-}
-
-type HouseholdChoreStore interface {
-	GetHouseholdChoreByHouseholdID(id int) ([]*HouseholdChore, error)
-	CreateHouseholdChore(HouseholdChore) error
-}
-
-type RegisterHouseholdChorePayload struct {
-	HouseholdID int `json:"householdID" validate:"required"`
-	ChoreID     int `json:"choreID" validate:"required"`
 }
 
 // -- Collectible Types
