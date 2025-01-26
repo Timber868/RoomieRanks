@@ -39,6 +39,8 @@ const router = useRouter();
             <RouterLink to="/" class="nav-item">Home</RouterLink> 
             <!-- <RouterLink to="/trade" class="nav-item">Trade</RouterLink> -->
             <!-- <RouterLink to="/money" class="nav-item">Money Management</RouterLink> -->
+            <RouterLink to="/household" class="nav-item">No Household</RouterLink>
+            <RouterLink to="/hasHousehold" class="nav-item">Yes Household</RouterLink>
             <RouterLink to="/profile" class="nav-item">Profile</RouterLink>
             <RouterLink to="/login" class="nav-item">Login/Register</RouterLink>
             <button class="nav-item" v-if="session.permissionLevel != 0" @click="handleLogout">Logout</button>
