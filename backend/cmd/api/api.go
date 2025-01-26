@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/Timber868/roomieranks/service/chore"
-	chore_instance "github.com/Timber868/roomieranks/service/chore-instance"
 	"github.com/Timber868/roomieranks/service/household"
 	"github.com/Timber868/roomieranks/service/user"
 	"github.com/gorilla/mux"
@@ -46,11 +45,6 @@ func (s *APIServer) Run() error {
 	choreStore := chore.NewStore(s.db)
 	choreHandler := chore.NewHandler(choreStore)
 	choreHandler.RegisterRoute(subrouter)
-
-	// Chore Instance Routes
-	choreInstanceStore := chore_instance.NewStore(s.db, choreStore)
-	choreInstanceHandler := chore_instance.NewHandler(choreInstanceStore)
-	choreInstanceHandler.RegisterRoute(subrouter)
 
 	log.Println("Listening on", s.addr)
 

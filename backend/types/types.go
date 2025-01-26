@@ -158,15 +158,15 @@ type RegisterDebtPayload struct {
 type Collectible struct {
 	ID           int    `json:"ID"`
 	Name         string `json:"name"`
-	IsLegendary  bool   `json:"isLegendary"`
-	UserUsername string `json:"userUsername"`
+	Rarity       string `json:"rarity"`
+	Type         string `json:"type"`
 	ImageURL     string `json:"imageURL"`
-	Evolution    int    `json:"evolution"`
+	UserUsername string `json:"userUsername"` // Must match the FK to users.username
 }
 
 type CollectibleStore interface {
 	GetCollectibleByID(id int) (*Collectible, error)
-	CreateCollectible(Collectible) error
+	CreateCollectible(username string) error
 }
 
 type RegisterCollectiblePayload struct {

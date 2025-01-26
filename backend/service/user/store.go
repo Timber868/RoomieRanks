@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/Timber868/roomieranks/service/collectible"
 	"github.com/Timber868/roomieranks/types"
 )
 
@@ -135,14 +136,20 @@ func (s *Store) AddXP(username string, xp int) error {
 
 	//Increment the level
 	u.XP += xp
+	var levelUps int
 
 	//Check if the user has enough XP to level up
 	if u.XP >= LevelUpXP {
 		//Could level up multiple times
-		levelUps := u.XP / LevelUpXP
+		levelUps = u.XP / LevelUpXP
 		//Level up the user
 		u.Level += levelUps
 		u.XP = u.XP - LevelUpXP*levelUps
+	}
+
+	fmt.Println(levelUps)
+	if levelUps > 0 {
+		s.handleLevelUp(*u)
 	}
 
 	//Update the user XP in the database
@@ -176,4 +183,11 @@ func (s *Store) ChangeHousingID(username string, householdID int) error {
 	}
 
 	return nil
+}
+
+func (s *Store) handleLevelUp(u types.User) {
+	//To be implemented
+	fmt.Println("User leveled up!")
+	collectibleStore := collectible.NewStore(s.db)
+	collectibleStore.CreateCollectible(u.Username)
 }

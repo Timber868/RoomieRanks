@@ -2,7 +2,10 @@ module github.com/Timber868/roomieranks
 
 go 1.23.1
 
-require github.com/go-playground/validator/v10 v10.24.0
+require (
+	github.com/go-playground/validator/v10 v10.24.0
+	github.com/joho/godotenv v1.5.1
+)
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
