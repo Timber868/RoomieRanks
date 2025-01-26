@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
@@ -49,4 +50,22 @@ func WriteJson(w http.ResponseWriter, status int, v any) error {
 	w.WriteHeader(status)
 
 	return json.NewEncoder(w).Encode(v)
+}
+
+func ConvertToInt(s string) (int, error) {
+	return strconv.Atoi(s)
+}
+
+func GetUsernameFromRequest(r *http.Request) (string, error) {
+	//Get the username from the request
+	username, ok := r.Context().Value("username").(string)
+	if !ok {
+		return "", fmt.Errorf("username not found in request")
+	}
+
+	return username, nil
+}
+
+func GetNextWeek() time.Time {
+	return time.Now().AddDate(0, 0, 7)
 }

@@ -80,31 +80,34 @@ type RegisterChorePayload struct {
 
 // Chore Instance type
 type ChoreInstance struct {
-	UserID    int       `json:"userID"`
+	ID        int       `json:"ID"`
+	Username  string    `json:"username"`
 	ChoreID   int       `json:"choreID"`
 	Completed bool      `json:"completed"`
 	DueDate   time.Time `json:"dueDate"`
 }
 
 type ChoreInstanceStore interface {
-	GetChoreInstanceByUserID(userId int) ([]*ChoreInstance, error)
+	GetChoreInstanceByUsername(username string) ([]*ChoreInstance, error)
 	GetChoreInstanceByChoreID(choreId int) ([]*ChoreInstance, error)
 	CreateChoreInstance(ChoreInstance) error
+	GetChoreInstanceByID(choreInstanceId int) (*ChoreInstance, error)
+	AssignChoreInstance(choreInstanceId int, username string) error
+	GetChoreXP(choreInstanceId int) (int, error)
+	CompleteChore(choreInstanceId int) error
 }
 
 type RegisterChoreInstancePayload struct {
-	UserID    int       `json:"userID" validate:"required"`
-	ChoreID   int       `json:"choreID" validate:"required"`
-	Completed bool      `json:"completed" validate:"required"`
-	DueDate   time.Time `json:"dueDate" validate:"required"`
+	Username string `json:"username" validate:"required"`
+	ChoreID  int    `json:"choreID" validate:"required"`
 }
 
 // -- Bill Types
 
 type Bill struct {
-	ID           int       `json:"ID"`
-	PurchaseDate time.Time `json:"purchaseDate"`
-	PayerID      int       `json:"payerID"`
+	ID            int       `json:"ID"`
+	PurchaseDate  time.Time `json:"purchaseDate"`
+	PayerUsername string    `json:"payerUsername"`
 }
 
 type BillStore interface {
@@ -113,39 +116,39 @@ type BillStore interface {
 }
 
 type RegisterBillPayload struct {
-	PurchaseDate time.Time `json:"purchaseDate" validate:"required"`
-	PayerID      int       `json:"payerID" validate:"required"`
+	PurchaseDate  time.Time `json:"purchaseDate" validate:"required"`
+	PayerUsername string    `json:"payerUsername" validate:"required"`
 }
 
 // -- Debt Types
 
 type Debt struct {
-	BillID int     `json:"billID"`
-	UserID int     `json:"userID"`
-	Amount float64 `json:"amount"`
+	BillID       int     `json:"billID"`
+	UserUsername string  `json:"userUsername"`
+	Amount       float64 `json:"amount"`
 }
 
 type DebtStore interface {
 	GetDebtByBillID(id int) ([]*Debt, error)
-	GetDebtByUserID(id int) ([]*Debt, error)
+	GetDebtByUserUsername(username string) ([]*Debt, error)
 	CreateDebt(Debt) error
 }
 
 type RegisterDebtPayload struct {
-	BillID int     `json:"billID" validate:"required"`
-	UserID int     `json:"userID" validate:"required"`
-	Amount float64 `json:"amount" validate:"required"`
+	BillID       int     `json:"billID" validate:"required"`
+	UserUsername string  `json:"userUsername" validate:"required"`
+	Amount       float64 `json:"amount" validate:"required"`
 }
 
 // -- Collectible Types
 
 type Collectible struct {
-	ID          int    `json:"ID"`
-	Name        string `json:"name"`
-	IsLegendary bool   `json:"isLegendary"`
-	UserID      int    `json:"userID"`
-	ImageURL    string `json:"imageURL"`
-	Evolution   int    `json:"evolution"`
+	ID           int    `json:"ID"`
+	Name         string `json:"name"`
+	IsLegendary  bool   `json:"isLegendary"`
+	UserUsername string `json:"userUsername"`
+	ImageURL     string `json:"imageURL"`
+	Evolution    int    `json:"evolution"`
 }
 
 type CollectibleStore interface {
@@ -154,11 +157,11 @@ type CollectibleStore interface {
 }
 
 type RegisterCollectiblePayload struct {
-	Name        string `json:"name" validate:"required"`
-	IsLegendary bool   `json:"isLegendary" validate:"required"`
-	UserID      int    `json:"userID" validate:"required"`
-	ImageURL    string `json:"imageURL" validate:"required"`
-	Evolution   int    `json:"evolution" validate:"required"`
+	Name         string `json:"name" validate:"required"`
+	IsLegendary  bool   `json:"isLegendary" validate:"required"`
+	UserUsername string `json:"userUsername" validate:"required"`
+	ImageURL     string `json:"imageURL" validate:"required"`
+	Evolution    int    `json:"evolution" validate:"required"`
 }
 
 // -- TradeRequest Types
@@ -178,9 +181,9 @@ type RegisterTradeRequestPayload struct {
 // -- CollectibleTradeItem Types
 
 type CollectibleTradeItem struct {
-	TradeRequestID int `json:"tradeRequestID"`
-	CollectibleID  int `json:"collectibleID"`
-	SenderID       int `json:"senderID"`
+	TradeRequestID int    `json:"tradeRequestID"`
+	CollectibleID  int    `json:"collectibleID"`
+	SenderUsername string `json:"senderUsername"`
 }
 
 type CollectibleTradeItemStore interface {
@@ -190,17 +193,17 @@ type CollectibleTradeItemStore interface {
 }
 
 type RegisterCollectibleTradeItemPayload struct {
-	TradeRequestID int `json:"tradeRequestID" validate:"required"`
-	CollectibleID  int `json:"collectibleID" validate:"required"`
-	SenderID       int `json:"senderID" validate:"required"`
+	TradeRequestID int    `json:"tradeRequestID" validate:"required"`
+	CollectibleID  int    `json:"collectibleID" validate:"required"`
+	SenderUsername string `json:"senderUsername" validate:"required"`
 }
 
 // -- ChoreTradeItem Types
 
 type ChoreTradeItem struct {
-	TradeRequestID int `json:"tradeRequestID"`
-	ChoreID        int `json:"choreID"`
-	SenderID       int `json:"senderID"`
+	TradeRequestID int    `json:"tradeRequestID"`
+	ChoreID        int    `json:"choreID"`
+	SenderUsername string `json:"senderUsername"`
 }
 
 type ChoreTradeItemStore interface {
@@ -210,7 +213,7 @@ type ChoreTradeItemStore interface {
 }
 
 type RegisterChoreTradeItemPayload struct {
-	TradeRequestID int `json:"tradeRequestID" validate:"required"`
-	ChoreID        int `json:"choreID" validate:"required"`
-	SenderID       int `json:"senderID" validate:"required"`
+	TradeRequestID int    `json:"tradeRequestID" validate:"required"`
+	ChoreID        int    `json:"choreID" validate:"required"`
+	SenderUsername string `json:"senderUsername" validate:"required"`
 }
