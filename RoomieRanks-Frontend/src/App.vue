@@ -29,13 +29,16 @@ const router = useRouter();
     <header>
       <nav class="navbar">
         <div class="nav-container">
-          <RouterLink to="/" class="nav-logo">
-            <img src="@/assets/roomie_logo.webp" alt="Logo" class="logo-image" />
-          </RouterLink>
+          <div class="nav-logo">
+            <span class="logo-text">
+              <span class="logo-roomie">Roomie</span>
+              <span class="logo-ranks">Ranks</span>
+            </span>
+          </div>
           <div class="nav-links">
             <RouterLink to="/" class="nav-item">Home</RouterLink> 
-            <RouterLink to="/trade" class="nav-item">Trade</RouterLink>
-            <RouterLink to="/money" class="nav-item">Money Management</RouterLink>
+            <!-- <RouterLink to="/trade" class="nav-item">Trade</RouterLink> -->
+            <!-- <RouterLink to="/money" class="nav-item">Money Management</RouterLink> -->
             <RouterLink to="/profile" class="nav-item">Profile</RouterLink>
             <RouterLink to="/login" class="nav-item">Login/Register</RouterLink>
             <button class="nav-item" v-if="session.permissionLevel != 0" @click="handleLogout">Logout</button>
@@ -50,8 +53,8 @@ const router = useRouter();
   </div>
 </template>
 
-<style scoped>
-* {
+<style>
+{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -67,7 +70,7 @@ const router = useRouter();
 
 header {
   width: 100%;
-  background-color: #2C3D47; 
+  background-color: #000000; 
   position: fixed;
   top: 0;
   left: 0;
@@ -110,22 +113,22 @@ header {
 }
 
 .nav-item:hover {
-  background-color: rgba(147, 81, 247, 0.2);
+  background-color: rgba(252, 164, 0, 0.2);
   transform: scale(1.05);
 }
 
 .nav-item:active {
-  background-color: rgba(147, 81, 247, 0.3);
+  background-color: rgba(252, 164, 0, 0.3);
   transform: scale(0.98);
 }
 
 .nav-item:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(147, 81, 247, 0.5);
+  box-shadow: 0 0 0 3px rgba(252, 164, 0, 0.5);
 }
 
 .router-link-exact-active.nav-item {
-  background-color: rgba(147, 81, 247, 0.3);
+  background-color: rgba(252, 164, 0, 0.3);
 }
 
 .router-link-active.nav-item {
@@ -140,7 +143,7 @@ main {
 }
 
 .logo-image {
-  height: 75px;
+  height: 35px;
   width: auto;
   display: block;
 }
@@ -156,17 +159,36 @@ button.nav-item {
 }
 
 button.nav-item:hover {
-  background-color: rgba(147, 81, 247, 0.2);
+  background-color: rgba(252, 164, 0, 0.2);
   transform: scale(1.05);
 }
 
 button.nav-item:active {
-  background-color: rgba(147, 81, 247, 0.3);
+  background-color: rgba(252, 164, 0, 0.3);
   transform: scale(0.98);
 }
 
 button.nav-item:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(147, 81, 247, 0.5);
+  box-shadow: 0 0 0 3px rgba(252, 164, 0, 0.5);
+}
+
+.logo-text {
+  font-family: 'Roboto', sans-serif; /* Use a boxy font or a similar one */
+  font-size: 1.5rem; /* Adjust the size as needed */
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.logo-roomie {
+  color: #00adef; /* Blue from Portal's color scheme */
+  text-transform: uppercase; /* Optional for a boxy effect */
+}
+
+.logo-ranks {
+  color: #fca400; /* Orange from Portal's color scheme */
+  text-transform: uppercase;
 }
 </style>
