@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/mux"
 )
 
 // Does caching so you only want to instatniate it once
@@ -30,4 +32,21 @@ func WriteJSON(w http.ResponseWriter, status int, v any) error {
 
 func WriteError(w http.ResponseWriter, status int, err error) {
 	WriteJSON(w, status, map[string]string{"error": err.Error()})
+}
+
+func GetIDFromRequest(r *http.Request, key string) (int, error) {
+	vars := mux.Vars(r)
+	id, ok := vars[key]
+	if !ok {
+		return 0, fmt.Errorf("missing id in request")
+	}
+
+	return strconv.Atoi(id)
+}
+
+func WriteJson(w http.ResponseWriter, status int, v any) error {
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(status)
+
+	return json.NewEncoder(w).Encode(v)
 }

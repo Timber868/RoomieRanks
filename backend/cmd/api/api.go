@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Timber868/roomieranks/service/chore"
 	"github.com/Timber868/roomieranks/service/household"
 	"github.com/Timber868/roomieranks/service/user"
 	"github.com/gorilla/mux"
@@ -35,10 +36,15 @@ func (s *APIServer) Run() error {
 	userHandler := user.NewHandler(userStore)
 	userHandler.RegisterRoute(subrouter)
 
-	//Household routes
+	// Household routes
 	householdStore := household.NewStore(s.db)
 	householdHandler := household.NewHandler(householdStore)
 	householdHandler.RegisterRoute(subrouter)
+
+	// Chore Routes
+	choreStore := chore.NewStore(s.db)
+	choreHandler := chore.NewHandler(choreStore)
+	choreHandler.RegisterRoute(subrouter)
 
 	log.Println("Listening on", s.addr)
 
