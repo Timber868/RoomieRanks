@@ -173,8 +173,6 @@ func (s *Store) CompleteChore(choreInstanceId int) error {
 
 	userStore := user.NewStore(s.db)
 
-	fmt.Println(chore_instance.Username)
-	fmt.Println(xp)
 	userStore.AddXP(chore_instance.Username, xp)
 
 	return nil
