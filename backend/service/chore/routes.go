@@ -21,6 +21,7 @@ func NewHandler(store types.ChoreStore) *Handler {
 
 func (h *Handler) RegisterRoute(router *mux.Router) {
 	router.HandleFunc("/chore", h.handleCreateChore).Methods("POST")
+	router.HandleFunc("/chore/assign", h.handleAssignChores).Methods("POST") // Method to assign all unassigned chores to users. Create chores_instance basically
 	router.HandleFunc("/chore/{id}", h.handleGetChoreByID).Methods("GET")
 	router.HandleFunc("/chore/household/{id}", h.handleGetChoreByHouseholdID).Methods("GET")
 	router.HandleFunc("/chore/{id}", h.handleUpdateChore).Methods("PUT")
@@ -160,4 +161,26 @@ func (h *Handler) handleDeleteChore(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJson(w, http.StatusOK, nil)
+}
+
+func (h *Handler) handleAssignChores(w http.ResponseWriter, r *http.Request) {
+	//Get the id from the request
+	id, err := utils.GetIDFromRequest(r, "id")
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	//Get the chores
+	_, err = h.store.GetChoreByHouseholdID(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Add up the total difficulty of the chores
+	// Find how many roomates are linked to that household
+	// Divide the total difficulty by the number of roomates
+	// Assign the chores to the roomates according to the difficulty
+	// If there are any chores left over, assign them to the roomate with the least chores;p
 }
