@@ -154,7 +154,7 @@ func (s *Store) GetChoreXP(choreInstanceId int) (int, error) {
 }
 
 func (s *Store) CompleteChore(choreInstanceId int) error {
-	updateQuery := fmt.Sprintf("UPDATE chore_instance SET completed = %t WHERE id = %d", true, choreInstanceId)
+	updateQuery := fmt.Sprintf("UPDATE chore_instance SET completed = %t WHERE chore_id = %d", true, choreInstanceId)
 
 	_, err := s.db.Exec(updateQuery)
 	if err != nil {

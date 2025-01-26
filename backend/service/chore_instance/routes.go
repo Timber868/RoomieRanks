@@ -23,7 +23,6 @@ func (h *Handler) RegisterRoute(router *mux.Router) {
 	router.HandleFunc("/chore-instance", h.handleCreateChoreInstance).Methods("POST")
 	router.HandleFunc("/chore-instance/{id}", h.handleGetChoreInstanceByID).Methods("GET")
 	router.HandleFunc("/chore-instance/assign/{id}", h.handleAssignChoreInstance).Methods("PUT")
-	// Assign does not work but is only for trading so can be implemented later
 	router.HandleFunc("/chore-instance/complete/{id}", h.handleCompleteChoreInstance).Methods("PUT")
 }
 

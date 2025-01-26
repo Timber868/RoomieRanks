@@ -93,7 +93,7 @@ type RegisterChorePayload struct {
 
 // Chore Instance type
 type ChoreInstance struct {
-	ID        int       `json:"ID"`
+	ID        int       `json:"id"`
 	Username  string    `json:"username"`
 	ChoreID   int       `json:"choreID"`
 	Completed bool      `json:"completed"`

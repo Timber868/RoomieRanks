@@ -2,10 +2,7 @@ module github.com/Timber868/roomieranks
 
 go 1.23.1
 
-require (
-	github.com/go-playground/validator/v10 v10.24.0
-	github.com/joho/godotenv v1.5.1
-)
+require github.com/go-playground/validator/v10 v10.24.0
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
@@ -21,6 +18,7 @@ require (
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/golang-migrate/migrate/v4 v4.18.1
 	github.com/gorilla/mux v1.8.1
+	github.com/joho/godotenv v1.5.1
 	github.com/leodido/go-urn v1.4.0 // indirect
 	golang.org/x/crypto v0.32.0
 	golang.org/x/net v0.34.0 // indirect
