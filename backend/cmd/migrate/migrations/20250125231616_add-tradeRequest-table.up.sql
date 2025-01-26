@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS trade_request (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`),
+    }
