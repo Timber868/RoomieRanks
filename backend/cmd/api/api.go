@@ -46,6 +46,11 @@ func (s *APIServer) Run() error {
 	choreHandler := chore.NewHandler(choreStore)
 	choreHandler.RegisterRoute(subrouter)
 
+	// Chore-instance Routes
+	choreInstanceStore := chore.NewStore(s.db)
+	choreInstanceHandler := chore.NewHandler(choreInstanceStore)
+	choreInstanceHandler.RegisterRoute(subrouter)
+
 	log.Println("Listening on", s.addr)
 
 	return http.ListenAndServe(s.addr, router)
