@@ -141,3 +141,21 @@ func (s *Store) LevelUp(username string) error {
 
 	return nil
 }
+
+func (s *Store) ChangeHousingID(username string, householdID int) error {
+	u, err := s.GetUserByUsername(username)
+	if err != nil {
+		return fmt.Errorf("user not found")
+	}
+
+	//Update the household id
+	u.HouseholdID = householdID
+
+	//Update the user in the database
+	_, err = s.db.Exec("UPDATE users SET household_id = ? WHERE username = ?", householdID, username)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

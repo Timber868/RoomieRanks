@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Timber868/roomieranks/service/auth"
+	"github.com/Timber868/roomieranks/service/household"
 	"github.com/Timber868/roomieranks/types"
 	"github.com/Timber868/roomieranks/utils"
 	"github.com/go-playground/validator/v10"
@@ -13,19 +14,24 @@ import (
 
 // Each service has a handler
 type Handler struct {
-	store types.UserStore
+	userStore      types.UserStore
+	householdStore *household.Store
 }
 
-func NewHandler(store types.UserStore) *Handler {
-	return &Handler{store: store}
+func NewHandler(userStore types.UserStore, householdStore *household.Store) *Handler {
+	return &Handler{
+		userStore:      userStore,
+		householdStore: householdStore,
+	}
 }
 
 func (h *Handler) RegisterRoute(router *mux.Router) {
 	router.HandleFunc("/login", h.handleLogin).Methods("POST")
 	router.HandleFunc("/register", h.handleRegister).Methods("POST")
 	router.HandleFunc("/user/{username}", h.handleGetUser).Methods("GET")
-	router.HandleFunc("/user/{username}/level", h.handleLevelUp).Methods("POST")
-	router.HandleFunc("/user/{username}/title", h.handleChangeTitle).Methods("POST")
+	router.HandleFunc("/user/{username}/household", h.handleChangeHousehold).Methods("PUT")
+	router.HandleFunc("/user/{username}/level", h.handleLevelUp).Methods("PUT")
+	router.HandleFunc("/user/{username}/title", h.handleChangeTitle).Methods("PUT")
 }
 
 func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +51,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u, err := h.store.GetUserByUsername(payload.Username)
+	u, err := h.userStore.GetUserByUsername(payload.Username)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("error, user not found, invalid username"))
 		return
@@ -79,16 +85,17 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//Check in the database if the user exists
-	u, _ := h.store.GetUserByUsername(payload.Username)
-	if u != nil {
+	// Check if the user already exists
+	_, err := h.userStore.GetUserByUsername(payload.Username)
+	// If err == nil, user was actually found -> can’t register
+	if err == nil {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("user with username %s already exists", payload.Username))
 		return
 	}
 
-	//Check if the email exists
-	u, _ = h.store.GetUserByEmail(payload.Email)
-	if u != nil {
+	// Same logic for the email check
+	_, err = h.userStore.GetUserByEmail(payload.Email)
+	if err == nil {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("user with email %s already exists", payload.Email))
 		return
 	}
@@ -101,7 +108,7 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//If not then you can register the user
-	err = h.store.CreateUser(types.User{
+	err = h.userStore.CreateUser(types.User{
 		Username:    payload.Username,
 		Name:        payload.Name,
 		Password:    hashedPassword,
@@ -133,7 +140,7 @@ func (h *Handler) handleGetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Get the user from the store
-	user, err := h.store.GetUserByUsername(username)
+	user, err := h.userStore.GetUserByUsername(username)
 	if err != nil {
 		utils.WriteError(w, http.StatusNotFound, err)
 		return
@@ -154,7 +161,7 @@ func (h *Handler) handleLevelUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Level up the user
-	err := h.store.LevelUp(username)
+	err := h.userStore.LevelUp(username)
 	if err == fmt.Errorf("user not found") {
 		utils.WriteError(w, http.StatusNotFound, err)
 		return
@@ -193,7 +200,7 @@ func (h *Handler) handleChangeTitle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Change the title
-	err := h.store.ChangeTitle(username, payload.Title)
+	err := h.userStore.ChangeTitle(username, payload.Title)
 	if err == fmt.Errorf("user not found") {
 		utils.WriteError(w, http.StatusNotFound, err)
 		return
@@ -202,4 +209,52 @@ func (h *Handler) handleChangeTitle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJSON(w, http.StatusOK, "Title changed")
+}
+
+/*
+Method to change the household of a user
+If you use the id 0 it unsets it
+If not the household needs to exist
+*/
+func (h *Handler) handleChangeHousehold(w http.ResponseWriter, r *http.Request) {
+	//Get the username from the url
+	vars := mux.Vars(r)
+	username, ok := vars["username"]
+
+	// Validate that the username is there
+	if !ok {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("missing username"))
+		return
+	}
+
+	//Type we will use to decode our payload
+	var payload types.ChangeHousingIDPayload
+
+	//Make sure it is a valid json
+	if err := utils.ParseJson(r, &payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	//validate the payload
+	if err := utils.Validate.Struct(payload); err != nil {
+		errors := err.(validator.ValidationErrors) //Necessary to get the erro message
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", errors))
+		return
+	}
+
+	//Check that the household we want to change to exists
+	u, _ := h.householdStore.GetHouseholdByID(payload.HouseholdID)
+	if u == nil {
+		utils.WriteError(w, http.StatusNotFound, fmt.Errorf("household with id %d not found", payload.HouseholdID))
+		return
+	}
+
+	//Change the household
+	err := h.userStore.ChangeHousingID(username, payload.HouseholdID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+	}
+
+	utils.WriteJSON(w, http.StatusOK, "Household changed")
 }

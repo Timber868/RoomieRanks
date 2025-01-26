@@ -21,6 +21,10 @@ type ChangeTitlePayload struct {
 	Title string `json:"title" validate:"required"`
 }
 
+type ChangeHousingIDPayload struct {
+	HouseholdID int `json:"household_id" validate:"required"`
+}
+
 type User struct {
 	Username    string `json:"username"`
 	Name        string `json:"name"`
@@ -36,9 +40,9 @@ type UserStore interface {
 	GetUserByUsername(username string) (*User, error)
 	GetUserByEmail(email string) (*User, error)
 	CreateUser(User) error
-	ModifyUser(User) error
 	ChangeTitle(username string, title string) error
 	LevelUp(username string) error
+	ChangeHousingID(username string, householdID int) error
 }
 
 // -- Household types
