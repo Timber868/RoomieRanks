@@ -272,6 +272,7 @@ func (h *Handler) handleChangeHousehold(w http.ResponseWriter, r *http.Request) 
 	err := h.userStore.ChangeHousingID(username, payload.HouseholdID)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	utils.WriteJSON(w, http.StatusOK, "Household changed")
