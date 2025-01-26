@@ -4,6 +4,7 @@ import LoginView from '@/views/LoginView.vue'
 import MoneyView from '@/views/MoneyView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import TradeView from '@/views/TradeView.vue'
+import RegisterView from '@/views/RegisterView.vue'
 
 
 const router = createRouter({
@@ -31,6 +32,10 @@ const router = createRouter({
       path: '/profile',
       name: 'Profile',
       component: ProfileView,
+    },    {
+      path: '/register',
+      name: 'Register',
+      component: RegisterView,
     },
   ],
 })
