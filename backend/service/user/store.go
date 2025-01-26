@@ -112,6 +112,19 @@ func (s *Store) ChangeTitle(username string, title string) error {
 }
 
 func (s *Store) LevelUp(username string) error {
-	//To be implemented
+	u, err := s.GetUserByUsername(username)
+	if err != nil {
+		return fmt.Errorf("user not found")
+	}
+
+	//Increment the level
+	u.Level++
+
+	//Update the user in the database
+	_, err = s.db.Exec("UPDATE users SET level = ? WHERE username = ?", u.Level, username)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
