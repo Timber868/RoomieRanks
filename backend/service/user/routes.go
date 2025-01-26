@@ -116,6 +116,7 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		HouseholdID: 0, // Users dont start off with households
 		Title:       "Newbie",
 		Level:       1, //You start off at level 1
+		XP:          0, //You start off with 0 xp
 	})
 
 	//Do error handling to validate data
