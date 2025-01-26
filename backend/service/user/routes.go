@@ -3,6 +3,7 @@ package user
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/Timber868/roomieranks/service/auth"
 	"github.com/Timber868/roomieranks/service/household"
@@ -30,7 +31,7 @@ func (h *Handler) RegisterRoute(router *mux.Router) {
 	router.HandleFunc("/register", h.handleRegister).Methods("POST")
 	router.HandleFunc("/user/{username}", h.handleGetUser).Methods("GET")
 	router.HandleFunc("/user/{username}/household", h.handleChangeHousehold).Methods("PUT")
-	router.HandleFunc("/user/{username}/level", h.handleLevelUp).Methods("PUT")
+	router.HandleFunc("/user/{username}/xp", h.handleAddXP).Methods("PUT")
 	router.HandleFunc("/user/{username}/title", h.handleChangeTitle).Methods("PUT")
 }
 
@@ -150,7 +151,7 @@ func (h *Handler) handleGetUser(w http.ResponseWriter, r *http.Request) {
 	utils.WriteJSON(w, http.StatusOK, user)
 }
 
-func (h *Handler) handleLevelUp(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handleAddXP(w http.ResponseWriter, r *http.Request) {
 	//Get the username from the url
 	vars := mux.Vars(r)
 	username, ok := vars["username"]
@@ -161,16 +162,32 @@ func (h *Handler) handleLevelUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var payload types.AddXPPayload
+
+	//Make sure it is a valid json
+	if err := utils.ParseJson(r, &payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	//validate the payload
+	if err := utils.Validate.Struct(payload); err != nil {
+		errors := err.(validator.ValidationErrors) //Necessary to get the erro message
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", errors))
+		return
+	}
+
 	//Level up the user
-	err := h.userStore.LevelUp(username)
-	if err == fmt.Errorf("user not found") {
+	err := h.userStore.AddXP(username, payload.XP)
+	if err != nil && strings.Contains(err.Error(), "user not found") {
 		utils.WriteError(w, http.StatusNotFound, err)
 		return
 	} else if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, "User leveled up")
+	utils.WriteJSON(w, http.StatusOK, "XP added successfully")
 }
 
 func (h *Handler) handleChangeTitle(w http.ResponseWriter, r *http.Request) {

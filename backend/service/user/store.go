@@ -7,8 +7,7 @@ import (
 	"github.com/Timber868/roomieranks/types"
 )
 
-//This is our file to handle repositories
-
+// This is our file to handle repositories
 type Store struct {
 	db *sql.DB
 }
@@ -56,6 +55,7 @@ func scanRowIntoUser(rows *sql.Rows) (*types.User, error) {
 		&user.HouseholdID,
 		&user.Title,
 		&user.Level,
+		&user.XP,
 	)
 
 	if err != nil {
@@ -69,7 +69,7 @@ func scanRowIntoUser(rows *sql.Rows) (*types.User, error) {
 
 func (s *Store) CreateUser(user types.User) error {
 	//Insert the user into the database
-	_, err := s.db.Exec("INSERT INTO users (username, name, email, password, household_id, title, level) VALUES (?, ?, ?, ?, ?, ?, ?)", user.Username, user.Name, user.Email, user.Password, user.HouseholdID, user.Title, user.Level)
+	_, err := s.db.Exec("INSERT INTO users (username, name, email, password, household_id, title, level, xp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", user.Username, user.Name, user.Email, user.Password, user.HouseholdID, user.Title, user.Level, user.XP)
 
 	return err
 }
@@ -124,16 +124,34 @@ func (s *Store) ChangeTitle(username string, title string) error {
 	return nil
 }
 
-func (s *Store) LevelUp(username string) error {
+// Constant that defines the amount of XP needed to level up
+const LevelUpXP = 20
+
+func (s *Store) AddXP(username string, xp int) error {
 	u, err := s.GetUserByUsername(username)
 	if err != nil {
 		return fmt.Errorf("user not found")
 	}
 
 	//Increment the level
-	u.Level++
+	u.XP += xp
 
-	//Update the user in the database
+	//Check if the user has enough XP to level up
+	if u.XP >= LevelUpXP {
+		//Could level up multiple times
+		levelUps := u.XP / LevelUpXP
+		//Level up the user
+		u.Level += levelUps
+		u.XP = u.XP - LevelUpXP*levelUps
+	}
+
+	//Update the user XP in the database
+	_, err = s.db.Exec("UPDATE users SET xp = ?, level = ? WHERE username = ?", u.XP, u.Level, username)
+	if err != nil {
+		return err
+	}
+
+	//Update the user level in the database
 	_, err = s.db.Exec("UPDATE users SET level = ? WHERE username = ?", u.Level, username)
 	if err != nil {
 		return err

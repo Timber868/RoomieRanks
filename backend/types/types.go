@@ -25,6 +25,10 @@ type ChangeHousingIDPayload struct {
 	HouseholdID int `json:"household_id" validate:"required"`
 }
 
+type AddXPPayload struct {
+	XP int `json:"xp" validate:"required"`
+}
+
 type User struct {
 	Username    string `json:"username"`
 	Name        string `json:"name"`
@@ -33,6 +37,7 @@ type User struct {
 	HouseholdID int    `json:"household_id"`
 	Title       string `json:"title"`
 	Level       int    `json:"level"`
+	XP          int    `json:"xp"`
 }
 
 // Interfaces are super easy to test so thats why
@@ -41,7 +46,7 @@ type UserStore interface {
 	GetUserByEmail(email string) (*User, error)
 	CreateUser(User) error
 	ChangeTitle(username string, title string) error
-	LevelUp(username string) error
+	AddXP(username string, xp int) error
 	ChangeHousingID(username string, householdID int) error
 }
 

@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     `household_id` INT UNSIGNED,
     `title` VARCHAR(255) NOT NULL,
     `level` INT UNSIGNED NOT NULL,
+    `xp` INT UNSIGNED NOT NULL,
 
 
     PRIMARY KEY (`username`),
