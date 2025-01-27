@@ -42,7 +42,7 @@ function handleLogout() {
             <RouterLink to="/household" class="nav-item">No Household</RouterLink>
             <RouterLink to="/hasHousehold" class="nav-item">Yes Household</RouterLink>
             <RouterLink to="/profile" class="nav-item">Profile</RouterLink>
-            <RouterLink to="/login" class="nav-item">Login/Register</RouterLink>
+            <RouterLink to="/login" v-if="session.permissionLevel == 0" class="nav-item">Login/Register</RouterLink>
             <button class="nav-item" v-if="session.permissionLevel != 0" @click="handleLogout">Logout</button>
           </div>
         </div>
@@ -56,12 +56,6 @@ function handleLogout() {
 </template>
 
 <style>
-{
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   min-height: 100vh;
