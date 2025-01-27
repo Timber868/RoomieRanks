@@ -8,6 +8,7 @@ import (
 	"github.com/Timber868/roomieranks/utils"
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 // Each service has a handler
@@ -20,6 +21,16 @@ func NewHandler(store types.ChoreInstanceStore) *Handler {
 }
 
 func (h *Handler) RegisterRoute(router *mux.Router) {
+	// CORS middleware: Only allow requests from localhost:5173 (adjust the port if needed)
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:5173"}, // Allow only this origin
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
+		AllowedHeaders: []string{"Content-Type"},
+	})
+
+	// Apply the CORS handler to the router
+	router.Use(corsHandler.Handler)
+
 	router.HandleFunc("/chore-instance", h.handleCreateChoreInstance).Methods("POST")
 	router.HandleFunc("/chore-instance/{id}", h.handleGetChoreInstanceByID).Methods("GET")
 	router.HandleFunc("/chore-instance/assign/{id}", h.handleAssignChoreInstance).Methods("PUT")

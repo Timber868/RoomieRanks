@@ -10,23 +10,23 @@
               <label for="password">Password</label>
               <input type="password" name="password" id="password" placeholder="" required v-model="password">
           </div>
-          <!-- <button class="sign-in" @click="attemptLogin" v-bind:disabled="!isInputValid()">Sign in</button> -->
+          <button class="sign-in" @click="attemptLogin" v-bind:disabled="!isInputValid()">Sign in</button>
       </form>
       <p class="create-account">Don't have an account?
           <RouterLink to="/Register" class="nav-item">Sign up</RouterLink>
-          <!-- <p v-if="errorMessage" class="error-message">{{  errorMessage }}</p> -->
+          <p v-if="errorMessage" class="error-message">{{  errorMessage }}</p>
       </p>
   </div>
 </template>
 
-<!-- <script>
-//import axios from "axios";
-//import { session } from "../session.js";
+<script>
+import axios from "axios";
+import { session } from "../session.ts";
 
-// const axiosClient = axios.create({
-// // NOTE: it's baseURL, not baseUrl
-// baseURL: "http://localhost:8080"
-// });
+const axiosClient = axios.create({
+  //NOTE: it's baseURL, not baseUrl
+  baseURL: "http://localhost:8080/api/v1"
+});
 
 export default {
   name: 'LoginView',
@@ -100,7 +100,7 @@ export default {
 
   }
 }
-</script> -->
+</script>
 
 <!--Open source: https://uiverse.io/Yaya12085/short-panda-24-->
 <style scoped>

@@ -18,23 +18,23 @@
           <label for="email">Email</label>
           <input type="text" name="email" id="email" placeholder="" required v-model="email">
       </div>
-          <!-- <button class="sign-in nav-item" @click="attemptSignUp" v-bind:disabled="!isInputValid()">Create Account</button> -->
+          <button class="sign-in nav-item" @click="attemptSignUp" v-bind:disabled="!isInputValid()">Create Account</button>
           <p class="login">Already have an account?
           <RouterLink to="/Login" class="nav-item">Login</RouterLink>
-          <!-- <p v-if="errorMessage" class="error-message">{{  errorMessage }}</p> -->
+          <p v-if="errorMessage" class="error-message">{{  errorMessage }}</p>
       </p>
   </form>
   </div>
 </template>
 
-<!-- <script>
+<script>
 import axios from "axios";
-import { session } from '../session.js'
+import { session } from '../session.ts'
 
 
 const axiosClient = axios.create({
 // NOTE: it's baseURL, not baseUrl
-baseURL: "http://localhost:8080"
+baseURL: "http://localhost:8080/api/v1"
 });
 
 export default {
@@ -46,7 +46,6 @@ export default {
     username: null,
     password: null,
           email: null,
-          phoneNumber: null,
           errorMessage: null
   };
 },
@@ -55,19 +54,16 @@ export default {
       async attemptSignUp() {
           event.preventDefault();  // Prevent the form from submitting and updating the URL
 
-    const customerRequest = {
-              name: this.name,
+    const newUserRequest = {
       username: this.username,
-      password: this.password,
               email: this.email,
-              phoneNumber: this.phoneNumber
+              password: this.password,
+              name: this.name,
     };
     try {
               console.log(sessionStorage.getItem("loggedInUsername"));
-              console.log(customerRequest)
-      const response = await axiosClient.post("/customers", customerRequest, {
-                  params: { loggedInUsername: sessionStorage.getItem("loggedInUsername") }   // Add the query parameter
-              });
+              console.log(newUserRequest)
+      const response = await axiosClient.post("/register", newUserRequest);
               this.username = response.data.username;
               this.permissionLevel = response.data.permissionLevel;
               sessionStorage.setItem("loggedInUsername", this.username);
@@ -76,7 +72,7 @@ export default {
               session.updateSession(response.data.username, response.data.permissionLevel);
               console.log("loggedInUsername is now:", sessionStorage.getItem("loggedInUsername"));
               console.log("permissionLevel is now:", sessionStorage.getItem("permissionLevel"));
-              this.$router.push("/account");
+              this.$router.push("/profile");
     }
     catch (error) {
               // Check if the error is a server response with a status code
@@ -113,12 +109,11 @@ export default {
           && this.password
           && this.name
           && this.email
-          && this.phoneNumber
       }
   }
 }
 
-</script> -->
+</script>
 
 <style scoped>
 .create-account {

@@ -10,6 +10,7 @@ import (
 	"github.com/Timber868/roomieranks/service/household"
 	"github.com/Timber868/roomieranks/service/user"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors" // Import the CORS package
 )
 
 // Stuct that defines the API server it has both its address and also a pointer to the database
@@ -52,7 +53,19 @@ func (s *APIServer) Run() error {
 	choreInstanceHandler := chore_instance.NewHandler(choreInstanceStore)
 	choreInstanceHandler.RegisterRoute(subrouter)
 
+	// Apply CORS middleware
+	// Allow all origins by default, or you can specify a list of allowed origins
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:5173"},         // You can replace this with your frontend's URL
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},  // Allowed HTTP methods
+		AllowedHeaders: []string{"Content-Type", "Authorization"}, // Allowed headers
+	})
+
+	// Wrap the router with CORS middleware
+	handler := corsHandler.Handler(router)
+
 	log.Println("Listening on", s.addr)
 
-	return http.ListenAndServe(s.addr, router)
+	// Start the server with the CORS-wrapped router
+	return http.ListenAndServe(s.addr, handler)
 }
