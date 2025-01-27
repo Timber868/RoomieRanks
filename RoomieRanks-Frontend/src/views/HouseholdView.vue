@@ -70,12 +70,13 @@ export default {
 
       // 2) Extract the new household's ID from response.data
       //    (Adjust this if your API uses a different field name)
-      const houseHoldID = response.data.id;
+      const houseHoldID = response.data;
       console.log("Household ID:", houseHoldID);
+      console.log("Username:", sessionStorage.getItem("loggedInUsername"));
 
       // 3) Update the user’s household ID with PUT
       const response2 = await axiosClient.put(
-        "/user/" + session.loggedInUsername + "/household/" + houseHoldID
+        "/user/" + sessionStorage.getItem("loggedInUsername") + "/household/" + houseHoldID
       );
       console.log("PUT /user/... response:", response2);
 
