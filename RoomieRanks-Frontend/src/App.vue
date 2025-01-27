@@ -6,22 +6,22 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-// onMounted(() => {
-//   // Initialize session storage if not set
-//   if (!sessionStorage.getItem("loggedInUsername")) {
-//     sessionStorage.setItem("loggedInUsername", "guest");
-//     session.loggedInUsername = "guest";
-//   }
-//   if (!sessionStorage.getItem("permissionLevel")) {
-//     sessionStorage.setItem("permissionLevel", 0);
-//     session.permissionLevel = 0;
-//   }
-// });
+onMounted(() => {
+  // Initialize session storage if not set
+  if (!sessionStorage.getItem("loggedInUsername")) {
+    sessionStorage.setItem("loggedInUsername", "guest");
+    session.loggedInUsername = "guest";
+  }
+  if (!sessionStorage.getItem("permissionLevel")) {
+    sessionStorage.setItem("permissionLevel", 0);
+    session.permissionLevel = 0;
+  }
+});
 
-// function handleLogout() {
-//   session.logout();
-//   router.push("/");
-// }
+function handleLogout() {
+  session.logout();
+  router.push("/");
+}
 </script>
 
 <template>
