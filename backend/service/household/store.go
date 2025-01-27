@@ -41,11 +41,20 @@ func (s *Store) GetHouseholdByID(id int) (*types.Household, error) {
 	return h, nil
 }
 
-func (s *Store) CreateHousehold(h types.Household) error {
-	//Insert the household into the database
-	_, err := s.db.Exec("INSERT INTO households (name) VALUES (?)", h.Name)
+func (s *Store) CreateHousehold(h types.Household) (int, error) {
+	// Insert the household into the database and get the result
+	result, err := s.db.Exec("INSERT INTO households (name) VALUES (?)", h.Name)
+	if err != nil {
+		return 0, err
+	}
 
-	return err
+	// Get the ID of the newly inserted household
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
 }
 
 func scanRowIntoHousehold(rows *sql.Rows) (*types.Household, error) {

@@ -3,6 +3,7 @@ package user
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/Timber868/roomieranks/service/auth"
@@ -41,7 +42,7 @@ func (h *Handler) RegisterRoute(router *mux.Router) {
 	router.HandleFunc("/login", h.handleLogin).Methods("POST")
 	router.HandleFunc("/register", h.handleRegister).Methods("POST")
 	router.HandleFunc("/user/{username}", h.handleGetUser).Methods("GET")
-	router.HandleFunc("/user/{username}/household", h.handleChangeHousehold).Methods("PUT")
+	router.HandleFunc("/user/{username}/household/{householdID}", h.handleChangeHousehold).Methods("PUT")
 	router.HandleFunc("/user/{username}/xp", h.handleAddXP).Methods("PUT")
 	router.HandleFunc("/user/{username}/title", h.handleChangeTitle).Methods("PUT")
 }
@@ -256,31 +257,30 @@ func (h *Handler) handleChangeHousehold(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	//Type we will use to decode our payload
-	var payload types.ChangeHousingIDPayload
+	//Get the householdID from the url
+	household, ok := vars["householdID"]
 
-	//Make sure it is a valid json
-	if err := utils.ParseJson(r, &payload); err != nil {
+	// Validate that the username is there
+	if !ok {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("missing householdID"))
+		return
+	}
+	householdID, err := strconv.Atoi(household)
+
+	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	//validate the payload
-	if err := utils.Validate.Struct(payload); err != nil {
-		errors := err.(validator.ValidationErrors) //Necessary to get the erro message
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", errors))
-		return
-	}
-
 	//Check that the household we want to change to exists
-	u, _ := h.householdStore.GetHouseholdByID(payload.HouseholdID)
+	u, _ := h.householdStore.GetHouseholdByID(householdID)
 	if u == nil {
-		utils.WriteError(w, http.StatusNotFound, fmt.Errorf("household with id %d not found", payload.HouseholdID))
+		utils.WriteError(w, http.StatusNotFound, fmt.Errorf("household with id %d not found", householdID))
 		return
 	}
 
 	//Change the household
-	err := h.userStore.ChangeHousingID(username, payload.HouseholdID)
+	err = h.userStore.ChangeHousingID(username, householdID)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
 		return

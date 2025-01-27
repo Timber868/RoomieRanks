@@ -21,10 +21,6 @@ type ChangeTitlePayload struct {
 	Title string `json:"title" validate:"required"`
 }
 
-type ChangeHousingIDPayload struct {
-	HouseholdID int `json:"household_id" validate:"required"`
-}
-
 type AddXPPayload struct {
 	XP int `json:"xp" validate:"required"`
 }
@@ -58,7 +54,7 @@ type Household struct {
 
 type HouseholdStore interface {
 	GetHouseholdByID(id int) (*Household, error)
-	CreateHousehold(Household) error
+	CreateHousehold(Household) (int, error)
 }
 
 type RegisterHouseholdPayload struct {
