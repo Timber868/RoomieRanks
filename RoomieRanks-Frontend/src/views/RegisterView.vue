@@ -21,8 +21,7 @@
           <button class="sign-in nav-item" @click="attemptSignUp" v-bind:disabled="!isInputValid()">Create Account</button>
           <p class="login">Already have an account?
           <RouterLink to="/Login" class="nav-item">Login</RouterLink>
-          <p v-if="errorMessage" class="error-message">{{  errorMessage }}</p>
-      </p>
+          </p>
   </form>
   </div>
 </template>
@@ -45,8 +44,7 @@ export default {
           name: null,
     username: null,
     password: null,
-          email: null,
-          errorMessage: null
+          email: null
   };
 },
 
@@ -72,27 +70,47 @@ export default {
               session.updateSession(response.data.username, response.data.permissionLevel);
               console.log("loggedInUsername is now:", sessionStorage.getItem("loggedInUsername"));
               console.log("permissionLevel is now:", sessionStorage.getItem("permissionLevel"));
-              this.$router.push("/profile");
+              
+              // Show success popup
+              this.$swal({
+                title: 'Success!',
+                text: 'Your account has been created successfully.',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#fc8400'
+              }).then(() => {
+                this.$router.push("/profile");
+              });
     }
     catch (error) {
               // Check if the error is a server response with a status code
               if (error.response) {
                   const status = error.response.status;
-                  const message = error.response.data?.message || "An error occurred.";
+                  // Backend returns errors in format: { "error": "error message" }
+                  const message = error.response.data?.error || "An error occurred.";
                   
-                  // Display user-friendly messages based on status codes or backend message
-                  if (status === 400 || status === 404 || status == 403) {
-                      this.errorMessage = message; // Example: Invalid credentials
-                      console.log(message);
-                  } else if (status === 403) {
-                      this.errorMessage = "Access denied. Please contact support.";
-                  } else {
-                      this.errorMessage = "An unexpected error occurred.";
-                  }
+                  // Format the error message: capitalize first letter and add period if missing
+                  let errorMessage = this.formatErrorMessage(message);
+                  console.log("Backend error:", message);
+                  
+                  // Show error popup
+                  this.$swal({
+                    title: 'Error!',
+                    text: errorMessage,
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#dc2626'
+                  });
               } else {
                   // Network or unexpected error
                   console.error(error);
-                  this.errorMessage = "Unable to connect to the server.";
+                  this.$swal({
+                    title: 'Connection Error!',
+                    text: 'Unable to connect to the server. Please check your internet connection and try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#dc2626'
+                  });
               }
           }
       },
@@ -100,8 +118,7 @@ export default {
       clearInputs() {
     this.username = null,
     this.password = null,
-          this.permissionLevel = 0,
-          this.errorMessage = null
+          this.permissionLevel = 0
   },
 
       isInputValid() {
@@ -109,6 +126,27 @@ export default {
           && this.password
           && this.name
           && this.email
+      },
+
+      formatErrorMessage(message) {
+          if (!message || typeof message !== 'string') {
+              return "An error occurred.";
+          }
+          
+          // Trim whitespace
+          let formattedMessage = message.trim();
+          
+          // Capitalize first letter
+          if (formattedMessage.length > 0) {
+              formattedMessage = formattedMessage.charAt(0).toUpperCase() + formattedMessage.slice(1);
+          }
+          
+          // Add period if it doesn't end with punctuation
+          if (formattedMessage.length > 0 && !formattedMessage.match(/[.!?]$/)) {
+              formattedMessage += '.';
+          }
+          
+          return formattedMessage;
       }
   }
 }
@@ -198,13 +236,6 @@ text-decoration: underline rgba(55, 65, 81, 1);
 background-color: rgba(75, 85, 99, 1);
 color: rgba(243, 244, 246, 0.5);
 cursor: not-allowed; 
-}
-
-.error-message {
-  color: red;
-  font-size: 0.875rem;
-  margin-top: 10px;
-  text-align: center;
 }
 
 .login {
