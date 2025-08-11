@@ -29,6 +29,7 @@
 <script>
 import axios from "axios";
 import { session } from '../session.ts'
+import { formatErrorMessage } from '../utils/errorFormatter.ts'
 
 
 const axiosClient = axios.create({
@@ -90,7 +91,7 @@ export default {
                   const message = error.response.data?.error || "An error occurred.";
                   
                   // Format the error message: capitalize first letter and add period if missing
-                  let errorMessage = this.formatErrorMessage(message);
+                  let errorMessage = formatErrorMessage(message);
                   console.log("Backend error:", message);
                   
                   // Show error popup
@@ -126,27 +127,6 @@ export default {
           && this.password
           && this.name
           && this.email
-      },
-
-      formatErrorMessage(message) {
-          if (!message || typeof message !== 'string') {
-              return "An error occurred.";
-          }
-          
-          // Trim whitespace
-          let formattedMessage = message.trim();
-          
-          // Capitalize first letter
-          if (formattedMessage.length > 0) {
-              formattedMessage = formattedMessage.charAt(0).toUpperCase() + formattedMessage.slice(1);
-          }
-          
-          // Add period if it doesn't end with punctuation
-          if (formattedMessage.length > 0 && !formattedMessage.match(/[.!?]$/)) {
-              formattedMessage += '.';
-          }
-          
-          return formattedMessage;
       }
   }
 }
