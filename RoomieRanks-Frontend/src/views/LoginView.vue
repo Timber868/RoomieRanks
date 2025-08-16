@@ -203,8 +203,8 @@ font-weight: 600;
 cursor: pointer;
 }
 
-.sign-in:hover {
-text-decoration: underline rgba(55, 65, 81, 1);
+.sign-in:hover:not(:disabled) {
+background-color: rgba(252, 164, 0, 0.7);
 }
 
 .create-account {

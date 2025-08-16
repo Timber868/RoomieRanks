@@ -18,7 +18,7 @@
           <label for="email">Email</label>
           <input type="text" name="email" id="email" placeholder="" required v-model="email">
       </div>
-          <button class="sign-in nav-item" @click="attemptSignUp" v-bind:disabled="!isInputValid()">Create Account</button>
+          <button class="sign-in" @click="attemptSignUp" v-bind:disabled="!isInputValid()">Create Account</button>
           <p class="login">Already have an account?
           <RouterLink to="/Login" class="nav-item">Login</RouterLink>
           </p>
@@ -195,7 +195,7 @@ text-decoration: underline rgba(252, 164, 0, 0.5);
 }
 
 .sign-in {
-margin-top: 20px;
+margin-top: 10px;
 display: block;
 width: 100%;
 background-color: rgba(252, 164, 0, 0.5);
@@ -208,8 +208,8 @@ font-weight: 600;
 cursor: pointer;
 }
 
-.sign-in:hover {
-text-decoration: underline rgba(55, 65, 81, 1);
+.sign-in:hover:not(:disabled) {
+background-color: rgba(252, 164, 0, 0.7);
 }
 
 .sign-in:disabled {
