@@ -53,18 +53,7 @@
          </div>
        </section>
 
-       <!-- Debug Section -->
-       <section class="debug-section">
-         <h2 class="section-title">Debug Information</h2>
-         <div class="info-card">
-           <p><strong>Session Username:</strong> {{ session.username }}</p>
-           <p><strong>Session Permission Level:</strong> {{ session.permissionLevel }}</p>
-           <p><strong>SessionStorage Username:</strong> {{ sessionStorage.getItem('loggedInUsername') }}</p>
-           <p><strong>SessionStorage Permission:</strong> {{ sessionStorage.getItem('permissionLevel') }}</p>
-           <button @click="refreshSession" class="debug-button">Refresh Session</button>
-           <button @click="testWithUsername" class="debug-button">Test with 'timber'</button>
-         </div>
-       </section>
+
     </main>
   </div>
 </template>
@@ -79,6 +68,7 @@ export default {
     return {
       loading: true,
       error: null,
+      session, // Add session to component data
       userData: {
         username: '',
         name: '',
@@ -161,23 +151,7 @@ export default {
                   console.log('🏁 Finished loading attempt');
        }
      },
-     refreshSession() {
-       console.log('🔄 Manual session refresh requested');
-       session.refreshFromStorage();
-       this.loadUserProfile();
-     },
-     async testWithUsername() {
-       console.log('🧪 Testing with hardcoded username "timber"');
-       try {
-         const userData = await fetchUser('timber');
-         console.log('✅ Test successful:', userData);
-         this.userData = userData;
-         this.error = null;
-       } catch (err) {
-         console.error('❌ Test failed:', err);
-         this.error = err.message;
-       }
-     },
+
      getXPForLevel(level) {
       // Simple XP calculation: each level requires level * 100 XP
       // Level 1: 0 XP, Level 2: 100 XP, Level 3: 300 XP, etc.
