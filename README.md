@@ -1,4 +1,10 @@
 # RoomieRanks
-Our repository for McHacks 2025. This will feature our roommate management application that helps with task assignments and accountability.
+Our repository for McHacks 2025. Find and rank apartments/roommates with a Vue + Go stack.
 
-gYYYYatttttt
+## ✨ Features
+- REST API in Go for listings, profiles, and rankings
+- Vue 3 SPA with TypeScript and component tests
+- MySQL schema with migrations & seed data
+
+## 🏗️ Architecture
+[Vue SPA] ⇄ [Go REST API] ⇄ [MySQL]
