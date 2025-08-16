@@ -63,12 +63,13 @@ export default {
               console.log(sessionStorage.getItem("loggedInUsername"));
               console.log(newUserRequest)
       const response = await axiosClient.post("/register", newUserRequest);
-              this.username = response.data.username;
-              this.permissionLevel = response.data.permissionLevel;
-              sessionStorage.setItem("loggedInUsername", this.username);
+              // The backend only returns a success message, not user data
+              // Store the username before clearing inputs
+              const loggedInUsername = this.username;
+              sessionStorage.setItem("loggedInUsername", loggedInUsername);
               sessionStorage.setItem("permissionLevel", 1);
               this.clearInputs();
-              session.updateSession(response.data.username, response.data.permissionLevel);
+              session.updateSession(loggedInUsername, 1);
               console.log("loggedInUsername is now:", sessionStorage.getItem("loggedInUsername"));
               console.log("permissionLevel is now:", sessionStorage.getItem("permissionLevel"));
               
