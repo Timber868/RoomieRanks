@@ -41,7 +41,7 @@
              <!-- User Collection Section -->
        <section class="user-collection">
          <h2 class="section-title">Your Collection</h2>
-         <div class="collection-container">
+         <div v-if="collection.length > 0" class="collection-container">
            <div v-for="card in collection" :key="card.id" class="card">
              <img :src="card.img" :alt="card.name" class="card-img" />
              <div class="card-details">
@@ -50,6 +50,9 @@
                <p class="card-type">Type: {{ card.type }}</p>
              </div>
            </div>
+         </div>
+         <div v-else class="empty-collection">
+           <p>No Pokemon cards collected yet. Complete chores to earn XP and level up to get cards!</p>
          </div>
        </section>
 
@@ -78,29 +81,7 @@ export default {
         level: 1,
         xp: 0
       },
-      collection: [
-        {
-          id: 1,
-          img: "https://via.placeholder.com/100x150",
-          name: "Golden Spoon",
-          rarity: "Rare",
-          type: "Tool",
-        },
-        {
-          id: 2,
-          img: "https://via.placeholder.com/100x150",
-          name: "Mighty Mop",
-          rarity: "Epic",
-          type: "Weapon",
-        },
-        {
-          id: 3,
-          img: "https://via.placeholder.com/100x150",
-          name: "Dishwasher Pro",
-          rarity: "Legendary",
-          type: "Appliance",
-        },
-      ],
+      collection: [],
     };
   },
   computed: {
@@ -143,6 +124,21 @@ export default {
          const userData = await fetchUser(username);
          console.log('✅ User data received:', userData);
          this.userData = userData;
+         
+         // Extract collectibles from the user data and populate the collection
+         if (userData.collectibles && Array.isArray(userData.collectibles)) {
+           this.collection = userData.collectibles.map(collectible => ({
+             id: collectible.ID,
+             img: collectible.imageURL,
+             name: collectible.name,
+             rarity: collectible.rarity,
+             type: collectible.type,
+           }));
+           console.log('🎴 Collection loaded:', this.collection);
+         } else {
+           console.log('📭 No collectibles found for user');
+           this.collection = [];
+         }
        } catch (err) {
          console.error('💥 Error in loadUserProfile:', err);
          this.error = err.message || 'Failed to load user profile';
@@ -300,6 +296,21 @@ export default {
  .card-type {
    font-size: 1rem;
    margin: 0.3rem 0;
+ }
+
+ .empty-collection {
+   text-align: center;
+   padding: 2rem;
+   background-color: rgba(255, 255, 255, 0.05);
+   border-radius: 10px;
+   margin-top: 1rem;
+ }
+
+ .empty-collection p {
+   color: #e5e7eb;
+   font-size: 1.1rem;
+   margin: 0;
+   font-style: italic;
  }
 
  /* Loading and Error States */

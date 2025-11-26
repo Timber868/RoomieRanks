@@ -160,6 +160,16 @@ func (h *Handler) handleGetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//Get the user's collectibles
+	collectibles, err := h.userStore.GetCollectiblesByUsername(username)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("error fetching collectibles: %v", err))
+		return
+	}
+
+	//Attach collectibles to the user
+	user.Collectibles = collectibles
+
 	utils.WriteJSON(w, http.StatusOK, user)
 }
 

@@ -1,106 +1,165 @@
 package user
 
-// func TestUserServiceHandlers(t *testing.T) {
-// 	//Create a new userstore that has been mocked
-// 	userStore := &mockUserStore{}
-// 	handler := NewHandler(userStore)
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 
-// 	t.Run("Invalid payload", func(t *testing.T) {
-// 		/*
-// 			Test with an invalid email section of the payload. Should fail with a bad request
-// 		*/
+	"github.com/Timber868/roomieranks/service/household"
+	"github.com/Timber868/roomieranks/types"
+	"github.com/gorilla/mux"
+)
 
-// 		payload := types.RegisterUserPayload{
-// 			Password: "asd",
-// 			Email:    "sad",
-// 		}
+func TestGetUserWithCollectibles(t *testing.T) {
+	// Create a new userstore that has been mocked
+	userStore := &mockUserStore{}
+	// Create a nil household store since we don't need it for this test
+	var householdStore *household.Store
+	handler := NewHandler(userStore, householdStore)
 
-// 		//Youve got to marshal your struct into a json
-// 		marshalled, _ := json.Marshal(payload)
+	t.Run("Should return user with collectibles", func(t *testing.T) {
+		// Create a request to get user with username "testuser"
+		req, err := http.NewRequest(http.MethodGet, "/user/testuser", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-// 		//Also need to transform it into a new byte buffer
-// 		req, err := http.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(marshalled))
+		// Set up router with the handler
+		router := mux.NewRouter()
+		router.HandleFunc("/user/{username}", handler.handleGetUser)
 
-// 		if err != nil {
-// 			//Automatically fails a test
-// 			t.Fatal(err)
-// 		}
+		// Create a response recorder
+		rr := httptest.NewRecorder()
+		router.ServeHTTP(rr, req)
 
-// 		//Actually make the request to our handler server
-// 		requestAgainstHandler := httptest.NewRecorder()
-// 		router := mux.NewRouter()
-// 		router.HandleFunc("/register", handler.handleRegister)
-// 		router.ServeHTTP(requestAgainstHandler, req)
+		// Check that the request was successful
+		if rr.Code != http.StatusOK {
+			t.Errorf("expected status code %d, got %d", http.StatusOK, rr.Code)
+		}
 
-// 		//Our test shoulve failed so check that
-// 		if requestAgainstHandler.Code != http.StatusBadRequest {
-// 			t.Errorf("expected status code %d, got %d", http.StatusBadRequest, requestAgainstHandler.Code)
-// 		}
-// 	})
+		// Parse the response to check if collectibles are included
+		var response map[string]interface{}
+		if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
+			t.Fatal(err)
+		}
 
-// 	t.Run("Should correctly register the user", func(t *testing.T) {
-// 		/*
-// 			Test with a valid payload. Should successfully create the user
-// 		*/
+		// Check that collectibles field exists and is an array
+		if collectibles, exists := response["collectibles"]; !exists {
+			t.Error("expected 'collectibles' field in response")
+		} else {
+			collectiblesArray, ok := collectibles.([]interface{})
+			if !ok {
+				t.Error("expected 'collectibles' to be an array")
+			}
 
-// 		payload := types.RegisterUserPayload{
-// 			Username: "user",
-// 			Name:     "hi",
-// 			Password: "invalid",
-// 			Email:    "sad@gmail.com",
-// 		}
+			// Check that we have the expected collectibles
+			if len(collectiblesArray) != 2 {
+				t.Errorf("expected 2 collectibles, got %d", len(collectiblesArray))
+			}
+		}
+	})
+}
 
-// 		//Youve got to marshal your struct into a json
-// 		marshalled, _ := json.Marshal(payload)
+type mockUserStore struct{}
 
-// 		//Also need to transform it into a new byte buffer
-// 		req, err := http.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(marshalled))
+func (s *mockUserStore) GetUserByUsername(username string) (*types.User, error) {
+	// Return a mock user with collectibles
+	return &types.User{
+		Username:    "testuser",
+		Name:        "Test User",
+		Email:       "test@example.com",
+		Password:    "hashedpassword",
+		HouseholdID: 1,
+		Title:       "Pokemon Master",
+		Level:       5,
+		XP:          150,
+		Collectibles: []types.Collectible{
+			{
+				ID:           1,
+				Name:         "Pikachu",
+				Rarity:       "Common",
+				Type:         "Electric",
+				ImageURL:     "https://example.com/pikachu.jpg",
+				UserUsername: "testuser",
+			},
+			{
+				ID:           2,
+				Name:         "Charizard",
+				Rarity:       "Rare",
+				Type:         "Fire",
+				ImageURL:     "https://example.com/charizard.jpg",
+				UserUsername: "testuser",
+			},
+		},
+	}, nil
+}
 
-// 		if err != nil {
-// 			//Automatically fails a test
-// 			t.Fatal(err)
-// 		}
+func (s *mockUserStore) GetUserByEmail(email string) (*types.User, error) {
+	return nil, fmt.Errorf("user not found")
+}
 
-// 		//Actually make the request to our handler server
-// 		requestAgainstHandler := httptest.NewRecorder()
-// 		router := mux.NewRouter()
-// 		router.HandleFunc("/register", handler.handleRegister)
-// 		router.ServeHTTP(requestAgainstHandler, req)
+func (s *mockUserStore) CreateUser(user types.User) error {
+	return nil
+}
 
-// 		//Our test shoulve failed so check that
-// 		if requestAgainstHandler.Code != http.StatusCreated {
-// 			t.Errorf("expected status code %d, got %d", http.StatusCreated, requestAgainstHandler.Code)
-// 		}
-// 	})
-// }
+func (s *mockUserStore) ChangeTitle(username string, title string) error {
+	return nil
+}
 
-// type mockUserStore struct{}
+func (s *mockUserStore) AddXP(username string, xp int) error {
+	return nil
+}
 
-// // Methods needed for a user store need to be mocked
-// func (s *mockUserStore) GetUserByUsername(email string) (*types.User, error) {
-// 	return nil, fmt.Errorf("username not found") //This needs to be mocked to ignore the case where user already exists
-// }
+func (s *mockUserStore) ChangeHousingID(username string, householdID int) error {
+	return nil
+}
 
-// func (s *mockUserStore) GetUserByID(id int) (*types.User, error) {
-// 	return nil, nil
-// }
+func (s *mockUserStore) GetCollectiblesByUsername(username string) ([]types.Collectible, error) {
+	return []types.Collectible{
+		{
+			ID:           1,
+			Name:         "Pikachu",
+			Rarity:       "Common",
+			Type:         "Electric",
+			ImageURL:     "https://example.com/pikachu.jpg",
+			UserUsername: "testuser",
+		},
+		{
+			ID:           2,
+			Name:         "Charizard",
+			Rarity:       "Rare",
+			Type:         "Fire",
+			ImageURL:     "https://example.com/charizard.jpg",
+			UserUsername: "testuser",
+		},
+	}, nil
+}
 
-// func (s *mockUserStore) CreateUser(user types.User) error {
-// 	return nil
-// }
+type mockHouseholdStore struct{}
 
-// func (s *mockUserStore) ModifyUser(user types.User) error {
-// 	return nil
-// }
+func (s *mockHouseholdStore) GetHouseholdByID(id int) (*types.Household, error) {
+	return &types.Household{
+		ID:   id,
+		Name: "Test Household",
+	}, nil
+}
 
-// func (s *mockUserStore) ChangeTitle(username string, title string) error {
-// 	return nil
-// }
+func (s *mockHouseholdStore) CreateHousehold(household types.Household) (int, error) {
+	return 1, nil
+}
 
-// func (s *mockUserStore) LevelUp(username string) error {
-// 	return nil
-// }
+// Integration test to verify the getUser endpoint works with real database
+func TestGetUserWithCollectiblesIntegration(t *testing.T) {
+	// This test requires a database connection
+	// Skip if not in integration test mode
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
 
-// func (s *mockUserStore) GetUserByEmail(email string) (*types.User, error) {
-// 	return nil, nil
-// }
+	// TODO: Set up test database connection
+	// TODO: Create test user with collectibles
+	// TODO: Test the actual API endpoint
+	t.Log("Integration test placeholder - requires database setup")
+}
