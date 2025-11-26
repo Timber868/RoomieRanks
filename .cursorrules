@@ -1,0 +1,73 @@
+Rule — Backend Development (TDD Required)
+Scope: backend code only (e.g., server, API, database, business logic).
+
+Goal: Always drive backend changes through tests first. No production code without a failing test.
+
+Workflow (Red → Green → Refactor)
+
+RED: Generate test cases for the requested feature/bugfix from the user story/acceptance criteria. Commit failing tests.
+
+GREEN: Implement the minimal code to make all new tests pass. Prefer small, focused changes.
+
+REFACTOR: Improve design with tests green (DRY, small functions, better names). Keep behavior identical.
+
+Authoring Tests
+
+Use Arrange–Act–Assert or Given–When–Then.
+
+Cover: happy path, edge cases, error handling, and integration seams.
+
+Mock/stub I/O; no real network calls in unit tests.
+
+Keep tests deterministic & fast (<500ms).
+
+Add regression tests for every bug found.
+
+What to Produce (per request)
+
+Brief test plan (list of cases + rationale).
+
+Test files first (compilable, failing).
+
+Minimal implementation to pass tests.
+
+Optional refactor with justification.
+
+Commands to run tests locally.
+
+Quality Bar
+
+New/changed code must have tests; ≥80% coverage for touched files.
+
+Keep logic small and pure; wire I/O at boundaries.
+
+Validate inputs; return precise errors.
+
+Style & Docs
+
+Clear, self-explanatory names; one assertion per behavior.
+
+Document complex business rules in test names/comments.
+
+Commit messages: test: …, feat: …, refactor: ….
+
+Non-Negotiables
+
+Do not write/alter production code before adding the failing test.
+
+Do not skip tests with TODOs; all tests must pass before merging.
+
+No flaky tests; control nondeterminism (seeds, fakes, time freeze).
+
+Rule — Frontend Development (Direct Implementation)
+Scope: frontend code only (e.g., UI components, styles, client-side logic).
+
+Skip test-driven development.
+
+Provide direct implementation for requested features.
+
+Focus on clean, maintainable code with clear structure and naming.
+
+Use inline comments only where logic is non-obvious.
+
+Prefer small, reusable components and minimal complexity.

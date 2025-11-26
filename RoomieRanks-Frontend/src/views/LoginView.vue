@@ -14,7 +14,6 @@
       </form>
       <p class="create-account">Don't have an account?
           <RouterLink to="/Register" class="nav-item">Sign up</RouterLink>
-          <p v-if="errorMessage" class="error-message">{{  errorMessage }}</p>
       </p>
   </div>
 </template>
@@ -22,6 +21,7 @@
 <script>
 import axios from "axios";
 import { session } from "../session.ts";
+import { formatErrorMessage } from '../utils/errorFormatter.ts';
 
 const axiosClient = axios.create({
   //NOTE: it's baseURL, not baseUrl
@@ -35,8 +35,7 @@ export default {
   return {
     username: null,
     password: null,
-    permissionLevel: 0,
-    errorMessage: null
+    permissionLevel: 0
   };
 },
   methods: {
@@ -54,34 +53,57 @@ export default {
               const response = await axiosClient.post("/login", newLoginDTO, {
                   params: { loggedInUsername: sessionStorage.getItem("loggedInUsername") }   // Add the query parameter
               });
-              this.username = response.data.username;
-              this.permissionLevel = response.data.permissionLevel;
-              sessionStorage.setItem("loggedInUsername", this.username);
-              sessionStorage.setItem("permissionLevel", this.permissionLevel);
+              // The backend only returns a success message, not user data
+              // Store the username before clearing inputs
+              const loggedInUsername = this.username;
+              sessionStorage.setItem("loggedInUsername", loggedInUsername);
+              sessionStorage.setItem("permissionLevel", 1);
               this.clearInputs();
-              session.updateSession(response.data.username, response.data.permissionLevel); // Update global state
+              session.updateSession(loggedInUsername, 1); // Update global state
               console.log("loggedInUsername is now:", sessionStorage.getItem("loggedInUsername"));
               console.log("permissionLevel is now:", sessionStorage.getItem("permissionLevel"));
-              this.$router.push("/");
+              
+              // Show success popup
+              this.$swal({
+                title: 'Success!',
+                text: 'You have been logged in successfully.',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#fc8400'
+              }).then(() => {
+                this.$router.push("/");
+              });
     }
     catch (error) {
               console.log("hey")
               // Check if the error is a server response with a status code
               if (error.response) {
                   const status = error.response.status;
-                  const message = error.response.data?.message || "An error occurred.";
+                  // Backend returns errors in format: { "error": "error message" }
+                  const message = error.response.data?.error || "An error occurred.";
                   
-                  // Display user-friendly messages based on status codes or backend message
-                  if (status === 400 || status === 404 || status === 403) {
-                      this.errorMessage = message; // Example: Invalid credentials
-                      console.log(message);
-                  } else {
-                      this.errorMessage = "An unexpected error occurred.";
-                  }
+                                     // Format the error message: capitalize first letter and add period if missing
+                   let errorMessage = formatErrorMessage(message);
+                  console.log("Backend error:", message);
+                  
+                  // Show error popup
+                  this.$swal({
+                    title: 'Login Error!',
+                    text: errorMessage,
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#dc2626'
+                  });
               } else {
                   // Network or unexpected error
                   console.error(error);
-                  this.errorMessage = "Unable to connect to the server.";
+                  this.$swal({
+                    title: 'Connection Error!',
+                    text: 'Unable to connect to the server. Please check your internet connection and try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#dc2626'
+                  });
               }
           }
 
@@ -90,13 +112,12 @@ export default {
   clearInputs() {
     this.username = null,
     this.password = null,
-          this.permissionLevel = 0,
-          this.errorMessage = null
+          this.permissionLevel = 0
   },
   isInputValid() {
     return this.username   
               && this.password
-  },
+  }
 
   }
 }
@@ -183,15 +204,8 @@ font-weight: 600;
 cursor: pointer;
 }
 
-.sign-in:hover {
-text-decoration: underline rgba(55, 65, 81, 1);
-}
-
-.error-message {
-  color: red;
-  font-size: 0.875rem;
-  margin-top: 10px;
-  text-align: center;
+.sign-in:hover:not(:disabled) {
+background-color: rgba(252, 164, 0, 0.7);
 }
 
 .create-account {

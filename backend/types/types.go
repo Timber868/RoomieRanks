@@ -26,14 +26,15 @@ type AddXPPayload struct {
 }
 
 type User struct {
-	Username    string `json:"username"`
-	Name        string `json:"name"`
-	Email       string `json:"email"`
-	Password    string `json:"-"`
-	HouseholdID int    `json:"household_id"`
-	Title       string `json:"title"`
-	Level       int    `json:"level"`
-	XP          int    `json:"xp"`
+	Username     string        `json:"username"`
+	Name         string        `json:"name"`
+	Email        string        `json:"email"`
+	Password     string        `json:"-"`
+	HouseholdID  int           `json:"household_id"`
+	Title        string        `json:"title"`
+	Level        int           `json:"level"`
+	XP           int           `json:"xp"`
+	Collectibles []Collectible `json:"collectibles,omitempty"`
 }
 
 // Interfaces are super easy to test so thats why
@@ -44,6 +45,7 @@ type UserStore interface {
 	ChangeTitle(username string, title string) error
 	AddXP(username string, xp int) error
 	ChangeHousingID(username string, householdID int) error
+	GetCollectiblesByUsername(username string) ([]Collectible, error)
 }
 
 // -- Household types

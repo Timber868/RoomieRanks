@@ -191,3 +191,31 @@ func (s *Store) handleLevelUp(u types.User) {
 	collectibleStore := collectible.NewStore(s.db)
 	collectibleStore.CreateCollectible(u.Username)
 }
+
+func (s *Store) GetCollectiblesByUsername(username string) ([]types.Collectible, error) {
+	rows, err := s.db.Query("SELECT * FROM collectible WHERE user_username = ?", username)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var collectibles []types.Collectible
+
+	for rows.Next() {
+		collectible := new(types.Collectible)
+		err := rows.Scan(
+			&collectible.ID,
+			&collectible.Name,
+			&collectible.Rarity,
+			&collectible.Type,
+			&collectible.ImageURL,
+			&collectible.UserUsername,
+		)
+		if err != nil {
+			return nil, err
+		}
+		collectibles = append(collectibles, *collectible)
+	}
+
+	return collectibles, nil
+}

@@ -18,11 +18,10 @@
           <label for="email">Email</label>
           <input type="text" name="email" id="email" placeholder="" required v-model="email">
       </div>
-          <button class="sign-in nav-item" @click="attemptSignUp" v-bind:disabled="!isInputValid()">Create Account</button>
+          <button class="sign-in" @click="attemptSignUp" v-bind:disabled="!isInputValid()">Create Account</button>
           <p class="login">Already have an account?
           <RouterLink to="/Login" class="nav-item">Login</RouterLink>
-          <p v-if="errorMessage" class="error-message">{{  errorMessage }}</p>
-      </p>
+          </p>
   </form>
   </div>
 </template>
@@ -30,6 +29,7 @@
 <script>
 import axios from "axios";
 import { session } from '../session.ts'
+import { formatErrorMessage } from '../utils/errorFormatter.ts'
 
 
 const axiosClient = axios.create({
@@ -45,8 +45,7 @@ export default {
           name: null,
     username: null,
     password: null,
-          email: null,
-          errorMessage: null
+          email: null
   };
 },
 
@@ -64,35 +63,56 @@ export default {
               console.log(sessionStorage.getItem("loggedInUsername"));
               console.log(newUserRequest)
       const response = await axiosClient.post("/register", newUserRequest);
-              this.username = response.data.username;
-              this.permissionLevel = response.data.permissionLevel;
-              sessionStorage.setItem("loggedInUsername", this.username);
+              // The backend only returns a success message, not user data
+              // Store the username before clearing inputs
+              const loggedInUsername = this.username;
+              sessionStorage.setItem("loggedInUsername", loggedInUsername);
               sessionStorage.setItem("permissionLevel", 1);
               this.clearInputs();
-              session.updateSession(response.data.username, response.data.permissionLevel);
+              session.updateSession(loggedInUsername, 1);
               console.log("loggedInUsername is now:", sessionStorage.getItem("loggedInUsername"));
               console.log("permissionLevel is now:", sessionStorage.getItem("permissionLevel"));
-              this.$router.push("/profile");
+              
+              // Show success popup
+              this.$swal({
+                title: 'Success!',
+                text: 'Your account has been created successfully.',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#fc8400'
+              }).then(() => {
+                this.$router.push("/profile");
+              });
     }
     catch (error) {
               // Check if the error is a server response with a status code
               if (error.response) {
                   const status = error.response.status;
-                  const message = error.response.data?.message || "An error occurred.";
+                  // Backend returns errors in format: { "error": "error message" }
+                  const message = error.response.data?.error || "An error occurred.";
                   
-                  // Display user-friendly messages based on status codes or backend message
-                  if (status === 400 || status === 404 || status == 403) {
-                      this.errorMessage = message; // Example: Invalid credentials
-                      console.log(message);
-                  } else if (status === 403) {
-                      this.errorMessage = "Access denied. Please contact support.";
-                  } else {
-                      this.errorMessage = "An unexpected error occurred.";
-                  }
+                  // Format the error message: capitalize first letter and add period if missing
+                  let errorMessage = formatErrorMessage(message);
+                  console.log("Backend error:", message);
+                  
+                  // Show error popup
+                  this.$swal({
+                    title: 'Error!',
+                    text: errorMessage,
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#dc2626'
+                  });
               } else {
                   // Network or unexpected error
                   console.error(error);
-                  this.errorMessage = "Unable to connect to the server.";
+                  this.$swal({
+                    title: 'Connection Error!',
+                    text: 'Unable to connect to the server. Please check your internet connection and try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#dc2626'
+                  });
               }
           }
       },
@@ -100,8 +120,7 @@ export default {
       clearInputs() {
     this.username = null,
     this.password = null,
-          this.permissionLevel = 0,
-          this.errorMessage = null
+          this.permissionLevel = 0
   },
 
       isInputValid() {
@@ -177,7 +196,7 @@ text-decoration: underline rgba(252, 164, 0, 0.5);
 }
 
 .sign-in {
-margin-top: 20px;
+margin-top: 10px;
 display: block;
 width: 100%;
 background-color: rgba(252, 164, 0, 0.5);
@@ -190,21 +209,14 @@ font-weight: 600;
 cursor: pointer;
 }
 
-.sign-in:hover {
-text-decoration: underline rgba(55, 65, 81, 1);
+.sign-in:hover:not(:disabled) {
+background-color: rgba(252, 164, 0, 0.7);
 }
 
 .sign-in:disabled {
 background-color: rgba(75, 85, 99, 1);
 color: rgba(243, 244, 246, 0.5);
 cursor: not-allowed; 
-}
-
-.error-message {
-  color: red;
-  font-size: 0.875rem;
-  margin-top: 10px;
-  text-align: center;
 }
 
 .login {
